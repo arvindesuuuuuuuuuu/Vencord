@@ -150,6 +150,7 @@ const hasExternalEmojiPerms = (channelId: string) => hasPermission(channelId, Pe
 const hasExternalStickerPerms = (channelId: string) => hasPermission(channelId, PermissionsBits.USE_EXTERNAL_STICKERS);
 const hasEmbedPerms = (channelId: string) => hasPermission(channelId, PermissionsBits.EMBED_LINKS);
 const hasAttachmentPerms = (channelId: string) => hasPermission(channelId, PermissionsBits.ATTACH_FILES);
+const getHyperLinkText = (name: string) => settings.store.hyperLinkText.replaceAll("{{NAME}}", name).trim() || "\u200b";
 
 function getWordBoundary(origStr: string, offset: number) {
     return (!origStr[offset] || /\s/.test(origStr[offset])) ? "" : " ";
@@ -876,7 +877,7 @@ export default definePlugin({
                     url.searchParams.set("name", sticker.name);
                     url.searchParams.set("lossless", "true");
 
-                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", sticker.name);
+                    const linkText = getHyperLinkText(sticker.name);
 
                     messageObj.content += `${getWordBoundary(messageObj.content, messageObj.content.length - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}`;
                     options.stickerIds!.length = 0;
@@ -898,7 +899,7 @@ export default definePlugin({
                     url.searchParams.set("name", emoji.name);
                     url.searchParams.set("lossless", "true");
 
-                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
+                    const linkText = getHyperLinkText(emoji.name);
 
                     messageObj.content = messageObj.content.replaceAll(emojiString, (match, offset, origStr) => {
                         url.searchParams.set("fakeNitro", String(fakeNitroEmbedIndex++));
@@ -935,7 +936,7 @@ export default definePlugin({
                 url.searchParams.set("lossless", "true");
                 url.searchParams.set("fakeNitro", String(fakeNitroEmbedIndex++));
 
-                const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
+                const linkText = getHyperLinkText(emoji.name);
 
                 return `${getWordBoundary(origStr, offset - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}${getWordBoundary(origStr, offset + emojiStr.length)}`;
             });
