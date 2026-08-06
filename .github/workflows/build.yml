@@ -68,5 +68,4 @@ jobs:
                   gh release create devbuild dist/* \
                     --title "DevBuild $RELEASE_TAG" \
                     --notes "Automated build from commit $RELEASE_TAG" \
-                    --prerelease \
                     --target $GITHUB_SHA
