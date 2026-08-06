@@ -884,6 +884,8 @@ export default definePlugin({
             }
 
             if (s.enableEmojiBypass) {
+                let fakeNitroEmbedIndex = 0;
+
                 for (const emoji of messageObj.validNonShortcutEmojis) {
                     if (this.canUseEmote(emoji, channelId)) continue;
 
@@ -898,7 +900,8 @@ export default definePlugin({
 
                     const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
 
-                    messageObj.content = messageObj.content.replace(emojiString, (match, offset, origStr) => {
+                    messageObj.content = messageObj.content.replaceAll(emojiString, (match, offset, origStr) => {
+                        url.searchParams.set("fakeNitro", String(fakeNitroEmbedIndex++));
                         return `${getWordBoundary(origStr, offset - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}${getWordBoundary(origStr, offset + match.length)}`;
                     });
                 }
@@ -917,6 +920,7 @@ export default definePlugin({
             if (!s.enableEmojiBypass) return;
 
             let hasBypass = false;
+            let fakeNitroEmbedIndex = 0;
 
             messageObj.content = messageObj.content.replace(/(?<!\\)<a?:(?:\w+):(\d+)>/ig, (emojiStr, emojiId, offset, origStr) => {
                 const emoji = EmojiStore.getCustomEmojiById(emojiId);
@@ -929,6 +933,7 @@ export default definePlugin({
                 url.searchParams.set("size", s.emojiSize.toString());
                 url.searchParams.set("name", emoji.name);
                 url.searchParams.set("lossless", "true");
+                url.searchParams.set("fakeNitro", String(fakeNitroEmbedIndex++));
 
                 const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
 
