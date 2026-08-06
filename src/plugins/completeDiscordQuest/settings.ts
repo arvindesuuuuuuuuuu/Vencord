@@ -50,6 +50,15 @@ export default definePluginSettings({
         description: "Whether to farm play activity quests automatically.",
         default: true
     },
+    farmAchievement: {
+        type: OptionType.BOOLEAN,
+        description: "⚠️ CAUTION: Whether to farm ACHIEVEMENT_IN_ACTIVITY quests automatically. "
+            + "This works by OAuth-authorizing the quest's app on your account, reporting progress "
+            + "to the activity backend, then revoking the grant afterward. "
+            + "This automates actions on your logged-in account and may put your account at risk "
+            + "under Discord's quest-automation enforcement. Off by default — enabling it is your explicit consent.",
+        default: false
+    },
     farmRewardCodes: {
         type: OptionType.BOOLEAN,
         description: "Whether to farm reward code quests automatically.",
