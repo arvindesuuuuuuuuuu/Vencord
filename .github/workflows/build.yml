@@ -56,7 +56,7 @@ jobs:
 
             - name: Publish/Update DevBuild Release
               # Update this line if you change your username or repo name
-              if: github.repository == 'djdoolky76/Vencord'
+              if: github.repository == 'arvindesuuuuuuuuuu/Vencord'
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   RELEASE_TAG: ${{ env.release_tag }}
