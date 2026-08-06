@@ -57,17 +57,23 @@ async function calculateGitChanges() {
 }
 
 async function fetchUpdates() {
+    // GET_UPDATES already calls this function to prepare the download list.
+    // Reuse that list when UPDATE is invoked instead of querying GitHub again
+    // and appending duplicate entries for the same files.
+    if (PendingUpdates.length > 0)
+        return true;
+
     const data = await githubGet("/releases/latest");
 
     const hash = data.name.slice(data.name.lastIndexOf(" ") + 1);
-    if (hash === gitHash)
+    if (hash === gitHash) {
+        PendingUpdates = [];
         return false;
+    }
 
-    data.assets.forEach(({ name, browser_download_url }) => {
-        if (VENCORD_FILES.some(s => name.startsWith(s))) {
-            PendingUpdates.push([name, browser_download_url]);
-        }
-    });
+    PendingUpdates = data.assets
+        .filter(({ name }) => VENCORD_FILES.some(s => name.startsWith(s)))
+        .map(({ name, browser_download_url }) => [name, browser_download_url]);
 
     return true;
 }
