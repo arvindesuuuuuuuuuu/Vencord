@@ -31,10 +31,14 @@ interface UserStatus {
 }
 
 interface Progress {
-    PLAY_ON_DESKTOP: PLAYONDESKTOP2;
+    PLAY_ON_DESKTOP?: QuestProgress;
+    STREAM_ON_DESKTOP?: QuestProgress;
+    PLAY_ACTIVITY?: QuestProgress;
+    WATCH_VIDEO?: QuestProgress;
+    WATCH_VIDEO_ON_MOBILE?: QuestProgress;
 }
 
-interface PLAYONDESKTOP2 {
+interface QuestProgress {
     eventName: string;
     value: number;
     updatedAt: string;
@@ -53,12 +57,12 @@ interface Config {
     startsAt: string;
     expiresAt: string;
     features: number[];
-    application: Application;
+    application?: Application;
     assets: Assets;
     colors: Colors;
     messages: Messages;
-    taskConfig: TaskConfig;
-    taskConfigV2: TaskConfigV2;
+    taskConfig?: TaskConfig;
+    taskConfigV2?: TaskConfigV2;
     rewardsConfig: RewardsConfig;
     sharePolicy: string;
 }
@@ -98,12 +102,17 @@ interface TaskConfigV2 {
 }
 
 interface Tasks {
-    PLAY_ON_DESKTOP: PLAYONDESKTOP;
+    PLAY_ON_DESKTOP?: QuestTask;
+    STREAM_ON_DESKTOP?: QuestTask;
+    PLAY_ACTIVITY?: QuestTask;
+    WATCH_VIDEO?: QuestTask;
+    WATCH_VIDEO_ON_MOBILE?: QuestTask;
 }
 
-interface PLAYONDESKTOP {
+interface QuestTask {
     type: string;
     target: number;
+    applications?: Array<{ id: string; }>;
 }
 
 interface Messages {
