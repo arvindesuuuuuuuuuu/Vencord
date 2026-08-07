@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -444,16 +444,14 @@ function completeQuest(quest: QuestValue) {
                             } catch (e: any) {
                                 failCount++;
                                 if (e?.status && [400, 403, 404, 409, 410].includes(e.status)) {
-                                    console.warn(`[Achievement] Heartbeat rejected (HTTP ${e.status}). Falling back to bypass after playtime.`);
+                                    // Discord explicitly rejected the heartbeat — skip straight to bypass, no point waiting
+                                    console.warn(`[Achievement] Heartbeat rejected (HTTP ${e.status}). Skipping to bypass immediately.`);
                                     heartbeatRejected = true;
-                                    // Still wait out remaining playtime before bypass for natural pacing
-                                    if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
                                     break;
                                 }
                                 if (failCount >= 5) {
-                                    console.warn("[Achievement] Too many heartbeat failures. Falling back to bypass.");
+                                    console.warn("[Achievement] Too many heartbeat failures. Skipping to bypass immediately.");
                                     heartbeatRejected = true;
-                                    if (remaining > 0) await new Promise(resolve => setTimeout(resolve, remaining));
                                     break;
                                 }
                             }
