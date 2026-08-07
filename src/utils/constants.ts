@@ -534,8 +534,8 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         id: 721717126523781240n,
     },
     nyx: {
-        name: "syntt_",
-        id: 1419678867005767783n
+        name: "verticalsync.",
+        id: 1207087393929171095n
     },
     nekohaxx: {
         name: "nekohaxx",
@@ -665,6 +665,10 @@ export const Devs = /* #__PURE__*/ Object.freeze({
     nicola02nb: {
         name: "nicola02nb",
         id: 257900031351193600n,
+    },
+    syntt: {
+        name: "syntt_",
+        id: 1419678867005767783n,
     }
 } satisfies Record<string, Dev>);
 
