@@ -84,15 +84,15 @@ export default definePluginSettings({
         description: "Whether to farm play activity quests automatically.",
         default: true
     },
+    farmAchievement: {
+        type: OptionType.BOOLEAN,
+        description: "Farm ACHIEVEMENT_IN_ACTIVITY quests automatically (see caution below).",
+        default: false
+    },
     farmAchievementCaution: {
         type: OptionType.COMPONENT,
         description: "",
         component: AchievementCaution,
-    },
-    farmAchievement: {
-        type: OptionType.BOOLEAN,
-        description: "Farm ACHIEVEMENT_IN_ACTIVITY quests automatically (see caution above).",
-        default: false
     },
     farmRewardCodes: {
         type: OptionType.BOOLEAN,
