@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -31,7 +31,7 @@ const fakeApplications = new Map();
 export default definePlugin({
     name: "CompleteDiscordQuest",
     description: "A plugin that completes multiple discord quests in background simultaneously.",
-    authors: [Devs.djdoolky76, Devs.nicola02nb],
+    authors: [Devs.nicola02nb, Devs.nyx, Devs.djdoolky76],
     settings,
     patches: [
         {

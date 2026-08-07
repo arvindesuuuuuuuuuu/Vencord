@@ -534,7 +534,7 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         id: 721717126523781240n,
     },
     nyx: {
-        name: "verticalsync.",
+        name: "Nyx",
         id: 1207087393929171095n
     },
     nekohaxx: {
