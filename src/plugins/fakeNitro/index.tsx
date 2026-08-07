@@ -71,7 +71,7 @@ const enum FakeNoticeType {
 const fakeNitroEmojiRegex = /\/emojis\/(\d+?)\.(png|webp|gif)/;
 const fakeNitroStickerRegex = /\/stickers\/(\d+?)\./;
 const fakeNitroGifStickerRegex = /\/attachments\/\d+?\/\d+?\/(\d+?)\.gif/;
-const hyperLinkRegex = /\[.+?\]\((https?:\/\/.+?)\)/;
+const hyperLinkRegex = /\[.*?\]\((https?:\/\/.+?)\)/;
 const mediaSizes = [16, 32, 48, 56, 64, 96, 128, 160, 256, 512, 1024];
 
 const DEFAULT_EMOJI_SIZE = 48;
@@ -884,7 +884,7 @@ export default definePlugin({
                     url.searchParams.set("name", sticker.name);
                     url.searchParams.set("lossless", "true");
 
-                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", sticker.name);
+                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", sticker.name) || "\u200b";
 
                     messageObj.content += `${getWordBoundary(messageObj.content, messageObj.content.length - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}`;
                     options.stickerIds!.length = 0;
@@ -905,7 +905,7 @@ export default definePlugin({
                     url.searchParams.set("name", emoji.name);
                     url.searchParams.set("lossless", "true");
 
-                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
+                    const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name) || "\u200b";
 
                     messageObj.content = messageObj.content.replace(emojiString, (match, offset, origStr) => {
                         return `${getWordBoundary(origStr, offset - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}${getWordBoundary(origStr, offset + match.length)}`;
@@ -941,7 +941,7 @@ export default definePlugin({
                 url.searchParams.set("name", emoji.name);
                 url.searchParams.set("lossless", "true");
 
-                const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name);
+                const linkText = s.hyperLinkText.replaceAll("{{NAME}}", emoji.name) || "\u200b";
 
                 return `${getWordBoundary(origStr, offset - 1)}${s.useHyperLinks ? `[${linkText}](${url})` : url}${getWordBoundary(origStr, offset + emojiStr.length)}`;
             });
