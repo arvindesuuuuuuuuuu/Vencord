@@ -59,6 +59,12 @@ export default definePluginSettings({
             + "under Discord's quest-automation enforcement. Off by default — enabling it is your explicit consent.",
         default: false
     },
+    achievementPlaytime: {
+        type: OptionType.NUMBER,
+        description: "How many minutes to simulate playtime before finalizing an ACHIEVEMENT_IN_ACTIVITY quest. "
+            + "Heartbeats are sent every 30s for this duration, mimicking real gameplay. Default: 15 minutes.",
+        default: 15
+    },
     farmRewardCodes: {
         type: OptionType.BOOLEAN,
         description: "Whether to farm reward code quests automatically.",
