@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Vencord, a Discord client mod
  * Copyright (c) 2025 Vendicated and contributors
  * SPDX-License-Identifier: GPL-3.0-or-later
@@ -403,61 +403,41 @@ function completeQuest(quest: QuestValue) {
                 const completeAchievement = async () => {
                     let achievementDone = false;
 
-                    // Phase 1: Simulate genuine playtime via timed heartbeats.
-                    // Sends a heartbeat every 30s for the configured playtime duration (default 15 min),
-                    // only finalizing at the end -- just like PLAY_ON_DESKTOP tracks real game time.
+                    // Phase 1: Try heartbeat spoof (works for some quests; most ACHIEVEMENT_IN_ACTIVITY
+                    // quests will return 403 and fall through to Phase 2 immediately).
                     if (achievementKey) {
                         const beat = { stream_key: achievementKey, application_id: String(applicationId || ""), terminal: false };
-                        const playtimeMs = (settings.store.achievementPlaytime ?? 15) * 60 * 1000;
-                        const startTime = Date.now();
                         let cur: number = quest.userStatus?.progress?.[taskName]?.value ?? 0;
                         let failCount = 0;
-                        let heartbeatRejected = false;
-                        console.log(`[Achievement] Simulating ${settings.store.achievementPlaytime ?? 15}min playtime for "${questName}"...`);
+                        console.log(`[Achievement] Attempting heartbeat for "${questName}" (${cur}/${secondsNeeded})...`);
 
-                        while (completingQuest.get(quest.id)) {
-                            const elapsed = Date.now() - startTime;
-                            const remaining = playtimeMs - elapsed;
-                            const elapsedMin = Math.floor(elapsed / 60000);
-
-                            if (remaining <= 0) {
-                                // Playtime elapsed -- send terminal and finalize
-                                console.log(`[Achievement] Playtime complete for "${questName}". Finalizing...`);
-                                try {
-                                    const r = await RestAPI.post({ url: `/quests/${quest.id}/heartbeat`, body: { ...beat, terminal: true } });
-                                    cur = r.body?.progress?.[taskName]?.value ?? r.body?.progress?.ACHIEVEMENT_IN_ACTIVITY?.value ?? cur;
-                                } catch { /* noop */ }
-                                if (cur >= secondsNeeded) achievementDone = true;
-                                break;
-                            }
-
+                        while (cur < secondsNeeded && completingQuest.get(quest.id)) {
                             try {
                                 const r = await RestAPI.post({ url: `/quests/${quest.id}/heartbeat`, body: beat });
                                 const newCur: number = r.body?.progress?.[taskName]?.value ?? r.body?.progress?.ACHIEVEMENT_IN_ACTIVITY?.value ?? cur;
                                 if (newCur > cur) {
                                     cur = newCur;
-                                    console.log(`[Achievement] "${questName}" progress: ${cur}/${secondsNeeded} (elapsed ${elapsedMin}min)`);
-                                } else {
-                                    console.log(`[Achievement] Heartbeat sent for "${questName}" -- ${cur}/${secondsNeeded} | ${elapsedMin}/${settings.store.achievementPlaytime ?? 15}min elapsed`);
+                                    console.log(`[Achievement] "${questName}" progress: ${cur}/${secondsNeeded}`);
                                 }
                                 failCount = 0;
+                                if (cur >= secondsNeeded) {
+                                    try { await RestAPI.post({ url: `/quests/${quest.id}/heartbeat`, body: { ...beat, terminal: true } }); }
+                                    catch { /* noop */ }
+                                    achievementDone = true;
+                                    break;
+                                }
                             } catch (e: any) {
                                 failCount++;
                                 if (e?.status && [400, 403, 404, 409, 410].includes(e.status)) {
-                                    // Discord explicitly rejected the heartbeat — skip straight to bypass, no point waiting
-                                    console.warn(`[Achievement] Heartbeat rejected (HTTP ${e.status}). Skipping to bypass immediately.`);
-                                    heartbeatRejected = true;
+                                    console.warn(`[Achievement] Heartbeat rejected (HTTP ${e.status}). Falling back to bypass.`);
                                     break;
                                 }
-                                if (failCount >= 5) {
-                                    console.warn("[Achievement] Too many heartbeat failures. Skipping to bypass immediately.");
-                                    heartbeatRejected = true;
+                                if (failCount >= 3) {
+                                    console.warn("[Achievement] Too many heartbeat failures. Falling back to bypass.");
                                     break;
                                 }
                             }
-
-                            // Heartbeat every 30 seconds -- matching Discord's real activity cadence
-                            await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+                            await new Promise(resolve => setTimeout(resolve, 20 * 1000));
                         }
                     }
 
