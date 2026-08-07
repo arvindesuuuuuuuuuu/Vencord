@@ -404,17 +404,25 @@ function completeQuest(quest: QuestValue) {
                     let achievementDone = false;
 
                     // Phase 1: Try heartbeat spoof first (works for some quests)
+                    // Steps through milestones one at a time with a 20s pause between each,
+                    // so progress goes 1/5 -> wait 20s -> 2/5 -> wait 20s -> ... naturally.
                     if (achievementKey) {
                         const beat = { stream_key: achievementKey, application_id: String(applicationId || ""), terminal: false };
-                        let cur = 0;
+                        // Seed from existing progress so a partially-done quest resumes from where it left off
+                        let cur: number = quest.userStatus?.progress?.[taskName]?.value ?? 0;
                         let failCount = 0;
-                        console.log(`[Achievement] Attempting heartbeat spoof for "${questName}"...`);
+                        console.log(`[Achievement] Starting stepped heartbeat for "${questName}" (step ${cur}/${secondsNeeded})...`);
 
                         while (cur < secondsNeeded && completingQuest.get(quest.id)) {
                             try {
                                 const r = await RestAPI.post({ url: `/quests/${quest.id}/heartbeat`, body: beat });
-                                cur = r.body?.progress?.[taskName]?.value ?? r.body?.progress?.ACHIEVEMENT_IN_ACTIVITY?.value ?? cur;
-                                console.log(`[Achievement] Heartbeat progress ${questName}: ${cur}/${secondsNeeded}`);
+                                const newCur: number = r.body?.progress?.[taskName]?.value ?? r.body?.progress?.ACHIEVEMENT_IN_ACTIVITY?.value ?? cur;
+                                if (newCur > cur) {
+                                    cur = newCur;
+                                    console.log(`[Achievement] "${questName}" step ${cur}/${secondsNeeded} ✓`);
+                                } else {
+                                    console.log(`[Achievement] No step change yet for "${questName}" (${cur}/${secondsNeeded})`);
+                                }
                                 failCount = 0;
                                 if (cur >= secondsNeeded) {
                                     try { await RestAPI.post({ url: `/quests/${quest.id}/heartbeat`, body: { ...beat, terminal: true } }); }
@@ -432,11 +440,15 @@ function completeQuest(quest: QuestValue) {
                                     console.warn("[Achievement] Too many heartbeat failures. Falling back to bypass.");
                                     break;
                                 }
+                                console.warn(`[Achievement] Heartbeat error (attempt ${failCount}/5), retrying after delay...`);
                             }
-                            await new Promise(resolve => setTimeout(resolve, 20 * 1000));
+                            // Wait 20 seconds before advancing to the next step
+                            if (!achievementDone && completingQuest.get(quest.id)) {
+                                console.log("[Achievement] Waiting 20s before next step...");
+                                await new Promise(resolve => setTimeout(resolve, 20 * 1000));
+                            }
                         }
                     }
-
                     // Phase 2: If heartbeat didn't finish, try Discord Says OAuth bypass
                     if (!achievementDone && completingQuest.get(quest.id)) {
                         if (!settings.store.farmAchievement) {
