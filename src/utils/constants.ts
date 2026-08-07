@@ -534,8 +534,8 @@ export const Devs = /* #__PURE__*/ Object.freeze({
         id: 721717126523781240n,
     },
     nyx: {
-        name: "Nyx",
-        id: 1207087393929171095n
+        name: "syntt_",
+        id: 1419678867005767783n
     },
     nekohaxx: {
         name: "nekohaxx",
