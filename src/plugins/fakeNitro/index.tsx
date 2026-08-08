@@ -238,7 +238,7 @@ async function uploadLargeFile(channelId: string) {
         const reply = PendingReplyStore.getPendingReply(channelId);
         await sendMessage(
             channelId,
-            { content: `[\u200b](${result.url})` },
+            { content: `[\u2800](${result.url})` },
             false,
             MessageActions.getSendMessageOptionsForReply(reply)
         );
