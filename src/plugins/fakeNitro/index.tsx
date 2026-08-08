@@ -16,19 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { NavContextMenuPatchCallback } from "@api/ContextMenu";
 import { addMessagePreEditListener, addMessagePreSendListener, removeMessagePreEditListener, removeMessagePreSendListener } from "@api/MessageEvents";
 import { definePluginSettings } from "@api/Settings";
+import { LinkIcon } from "@components/Icons";
 import { ApngBlendOp, ApngDisposeOp, parseAPNG } from "@utils/apng";
 import { Devs } from "@utils/constants";
-import { getCurrentGuild } from "@utils/discord";
+import { getCurrentGuild, sendMessage } from "@utils/discord";
 import { Logger } from "@utils/Logger";
-import definePlugin, { OptionType } from "@utils/types";
+import definePlugin, { OptionType, PluginNative } from "@utils/types";
+import { chooseFile } from "@utils/web";
 import type { Emoji, Message, RenderModalProps, Sticker } from "@vencord/discord-types";
 import { StickerFormatType } from "@vencord/discord-types/enums";
 import { findByCodeLazy, findByPropsLazy, proxyLazyWebpack } from "@webpack";
-import { ChannelStore, ConfirmModal,DraftType, EmojiStore, FluxDispatcher, Forms, GuildMemberStore, IconUtils, lodash, openModal, Parser, PermissionsBits, PermissionStore, StickersStore, UploadHandler, UserSettingsActionCreators, UserSettingsProtoStore, UserStore } from "@webpack/common";
+import { ChannelStore, ConfirmModal, DraftType, EmojiStore, FluxDispatcher, Forms, GuildMemberStore, IconUtils, lodash, Menu, MessageActions, openModal, Parser, PendingReplyStore, PermissionsBits, PermissionStore, showToast, StickersStore, Toasts, UploadHandler, UserSettingsActionCreators, UserSettingsProtoStore, UserStore } from "@webpack/common";
 import { applyPalette, GIFEncoder, quantize } from "gifenc";
 import type { ReactElement, ReactNode } from "react";
+
+const Native = VencordNative.pluginHelpers.FakeNitro as PluginNative<typeof import("./native")>;
+const CATBOX_MAX_FILE_SIZE = 200 * 1024 * 1024;
 
 const BINARY_READ_OPTIONS = findByPropsLazy("readerFactory");
 
@@ -121,6 +127,11 @@ const settings = definePluginSettings({
         default: true,
         restartNeeded: true
     },
+    enableFileSizeBypass: {
+        description: "Adds an Upload Large File option that uploads files up to 200 MB to Catbox and sends the link",
+        type: OptionType.BOOLEAN,
+        default: true
+    },
     useHyperLinks: {
         description: "Whether to use hyperlinks when sending fake emojis and stickers",
         type: OptionType.BOOLEAN,
@@ -181,6 +192,81 @@ function showCannotEmbedNotice() {
     });
 }
 
+function formatFileSize(bytes: number) {
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function showExternalUploadNotice(file: File) {
+    return new Promise<boolean>(resolve => {
+        openModal(props => (
+            <ConfirmModal
+                {...props}
+                title="Upload file outside Discord?"
+                subtitle={`${file.name} (${formatFileSize(file.size)}) will be uploaded anonymously to Catbox. Anyone with the link can access it, and FakeNitro cannot delete anonymous uploads.`}
+                confirmText="Upload and Send Link"
+                cancelText="Cancel"
+                onConfirm={() => resolve(true)}
+                onCloseCallback={() => setImmediate(() => resolve(false))}
+            />
+        ));
+    });
+}
+
+async function uploadLargeFile(channelId: string) {
+    const file = await chooseFile("*/*");
+    if (!file) return;
+
+    if (file.size > CATBOX_MAX_FILE_SIZE) {
+        showToast("Catbox only accepts files up to 200 MB", Toasts.Type.FAILURE);
+        return;
+    }
+
+    if (!await showExternalUploadNotice(file)) return;
+
+    showToast(`Uploading ${file.name} to Catbox...`, Toasts.Type.MESSAGE);
+
+    try {
+        const result = await Native.uploadLargeFile(
+            new Uint8Array(await file.arrayBuffer()),
+            file.name,
+            file.type
+        );
+
+        if (!result.ok || !result.url)
+            throw new Error(result.error || "Catbox returned no file URL");
+
+        const reply = PendingReplyStore.getPendingReply(channelId);
+        await sendMessage(
+            channelId,
+            { content: result.url },
+            false,
+            MessageActions.getSendMessageOptionsForReply(reply)
+        );
+
+        if (reply)
+            FluxDispatcher.dispatch({ type: "DELETE_PENDING_REPLY", channelId });
+
+        showToast("Large file link sent", Toasts.Type.SUCCESS);
+    } catch (error) {
+        new Logger("FakeNitro").error("Failed to upload large file", error);
+        showToast(`Large file upload failed: ${error instanceof Error ? error.message : String(error)}`, Toasts.Type.FAILURE);
+    }
+}
+
+const fileUploadContextMenuPatch: NavContextMenuPatchCallback = (children, props) => {
+    if (!IS_DISCORD_DESKTOP || !settings.store.enableFileSizeBypass || !props.channel) return;
+    if (props.channel.guild_id && !PermissionStore.can(PermissionsBits.SEND_MESSAGES, props.channel)) return;
+
+    children.push(
+        <Menu.MenuItem
+            id="vc-fake-nitro-upload-large-file"
+            iconLeft={LinkIcon}
+            label="Upload Large File (Catbox)"
+            action={() => uploadLargeFile(props.channel.id)}
+        />
+    );
+};
+
 export default definePlugin({
     name: "FakeNitro",
     authors: [Devs.Arjix, Devs.D3SOX, Devs.Ven, Devs.fawn, Devs.captain, Devs.Nuckyz, Devs.AutumnVN, Devs.sadan],
@@ -189,6 +275,10 @@ export default definePlugin({
     dependencies: ["MessageEventsAPI"],
 
     settings,
+
+    contextMenus: {
+        "channel-attach": fileUploadContextMenuPatch
+    },
 
     patches: [
         {
