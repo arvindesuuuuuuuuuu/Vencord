@@ -29,12 +29,13 @@ import { chooseFile } from "@utils/web";
 import type { Emoji, Message, RenderModalProps, Sticker } from "@vencord/discord-types";
 import { StickerFormatType } from "@vencord/discord-types/enums";
 import { findByCodeLazy, findByPropsLazy, proxyLazyWebpack } from "@webpack";
-import { ChannelStore, ConfirmModal, DraftType, EmojiStore, FluxDispatcher, Forms, GuildMemberStore, IconUtils, lodash, Menu, MessageActions, openModal, Parser, PendingReplyStore, PermissionsBits, PermissionStore, showToast, StickersStore, Toasts, UploadHandler, UserSettingsActionCreators, UserSettingsProtoStore, UserStore } from "@webpack/common";
+import { ChannelStore, ConfirmModal, DraftStore, DraftType, EmojiStore, FluxDispatcher, Forms, GuildMemberStore, IconUtils, lodash, Menu, MessageActions, openModal, Parser, PendingReplyStore, PermissionsBits, PermissionStore, showToast, StickersStore, TextArea, Toasts, UploadHandler, UserSettingsActionCreators, UserSettingsProtoStore, UserStore, useState } from "@webpack/common";
 import { applyPalette, GIFEncoder, quantize } from "gifenc";
 import type { ReactElement, ReactNode } from "react";
 
 const Native = VencordNative.pluginHelpers.FakeNitro as PluginNative<typeof import("./native")>;
 const CATBOX_MAX_FILE_SIZE = 200 * 1024 * 1024;
+const DraftManager = findByPropsLazy("clearDraft", "saveDraft");
 
 const BINARY_READ_OPTIONS = findByPropsLazy("readerFactory");
 
@@ -196,17 +197,46 @@ function formatFileSize(bytes: number) {
     return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function showExternalUploadNotice(file: File) {
-    return new Promise<boolean>(resolve => {
+function ExternalUploadNoticeModal({ modalProps, file, initialMessage, resolve }: {
+    modalProps: RenderModalProps;
+    file: File;
+    initialMessage: string;
+    resolve: (message: string | null) => void;
+}) {
+    const [message, setMessage] = useState(initialMessage);
+
+    return (
+        <ConfirmModal
+            {...modalProps}
+            title="Upload file outside Discord?"
+            confirmText="Upload and Send"
+            cancelText="Cancel"
+            onConfirm={() => resolve(message.trim())}
+            onCloseCallback={() => setImmediate(() => resolve(null))}
+        >
+            <Forms.FormText>
+                {file.name} ({formatFileSize(file.size)}) will be uploaded anonymously to Catbox. Anyone with the link can access it, and FakeNitro cannot delete anonymous uploads.
+            </Forms.FormText>
+            <Forms.FormTitle style={{ marginTop: 16 }}>Message (optional)</Forms.FormTitle>
+            <TextArea
+                value={message}
+                onChange={setMessage}
+                placeholder="Add a message with your file"
+                maxLength={1800}
+                autosize
+            />
+        </ConfirmModal>
+    );
+}
+
+function showExternalUploadNotice(file: File, initialMessage: string) {
+    return new Promise<string | null>(resolve => {
         openModal(props => (
-            <ConfirmModal
-                {...props}
-                title="Upload file outside Discord?"
-                subtitle={`${file.name} (${formatFileSize(file.size)}) will be uploaded anonymously to Catbox. Anyone with the link can access it, and FakeNitro cannot delete anonymous uploads.`}
-                confirmText="Upload and Send Link"
-                cancelText="Cancel"
-                onConfirm={() => resolve(true)}
-                onCloseCallback={() => setImmediate(() => resolve(false))}
+            <ExternalUploadNoticeModal
+                modalProps={props}
+                file={file}
+                initialMessage={initialMessage}
+                resolve={resolve}
             />
         ));
     });
@@ -221,7 +251,11 @@ async function uploadLargeFile(channelId: string) {
         return;
     }
 
-    if (!await showExternalUploadNotice(file)) return;
+    const message = await showExternalUploadNotice(
+        file,
+        DraftStore.getDraft(channelId, DraftType.ChannelMessage) ?? ""
+    );
+    if (message == null) return;
 
     showToast(`Uploading ${file.name} to Catbox...`, Toasts.Type.MESSAGE);
 
@@ -236,13 +270,15 @@ async function uploadLargeFile(channelId: string) {
             throw new Error(result.error || "Catbox returned no file URL");
 
         const reply = PendingReplyStore.getPendingReply(channelId);
+        const hiddenLink = `[\u2800](${result.url})`;
         await sendMessage(
             channelId,
-            { content: `[\u2800](${result.url})` },
+            { content: message ? `${message}\n${hiddenLink}` : hiddenLink },
             false,
             MessageActions.getSendMessageOptionsForReply(reply)
         );
 
+        DraftManager.clearDraft(channelId, DraftType.ChannelMessage);
         if (reply)
             FluxDispatcher.dispatch({ type: "DELETE_PENDING_REPLY", channelId });
 
@@ -604,17 +640,24 @@ export default definePlugin({
     },
 
     patchFakeNitroEmojisOrRemoveStickersLinks(content: Array<any>, inline: boolean) {
+        const isHiddenLargeFileLink = (child: ReactElement<any>) => (
+            settings.store.enableFileSizeBypass
+            && typeof child?.props?.href === "string"
+            && child.props.href.startsWith("https://files.catbox.moe/")
+            && String(child.props.children) === "\u2800"
+        );
+
         // If content has more than one child or it's a single ReactElement like a header, list or span
-        if ((content.length > 1 || typeof content[0]?.type === "string") && !settings.store.transformCompoundSentence) return content;
+        if (
+            (content.length > 1 || typeof content[0]?.type === "string")
+            && !settings.store.transformCompoundSentence
+            && !content.some(isHiddenLargeFileLink)
+        ) return content;
 
         let nextIndex = content.length;
 
         const transformLinkChild = (child: ReactElement<any>) => {
-            if (
-                settings.store.enableFileSizeBypass
-                && child.props.href.startsWith("https://files.catbox.moe/")
-                && String(child.props.children) === "\u2800"
-            ) return null;
+            if (isHiddenLargeFileLink(child)) return null;
 
             if (settings.store.transformEmojis) {
                 const fakeNitroMatch = child.props.href.match(fakeNitroEmojiRegex);
