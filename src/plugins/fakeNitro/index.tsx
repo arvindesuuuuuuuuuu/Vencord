@@ -646,12 +646,21 @@ export default definePlugin({
             && child.props.href.startsWith("https://files.catbox.moe/")
             && String(child.props.children) === "\u2800"
         );
+        const containsHiddenLargeFileLink = (child: ReactElement<any>): boolean => {
+            if (isHiddenLargeFileLink(child)) return true;
+
+            const children = child?.props?.children;
+            if (Array.isArray(children)) return children.some(containsHiddenLargeFileLink);
+            if (children && typeof children === "object") return containsHiddenLargeFileLink(children);
+
+            return false;
+        };
 
         // If content has more than one child or it's a single ReactElement like a header, list or span
         if (
             (content.length > 1 || typeof content[0]?.type === "string")
             && !settings.store.transformCompoundSentence
-            && !content.some(isHiddenLargeFileLink)
+            && !content.some(containsHiddenLargeFileLink)
         ) return content;
 
         let nextIndex = content.length;
@@ -698,10 +707,12 @@ export default definePlugin({
             if (child?.props?.children != null) {
                 if (!Array.isArray(child.props.children)) {
                     child.props.children = modifyChild(child.props.children);
+                    if (child.props.children == null) return null;
                     return child;
                 }
 
                 child.props.children = modifyChildren(child.props.children);
+                this.trimContent(child.props.children);
                 if (child.props.children.length === 0) return null;
                 return child;
             }
