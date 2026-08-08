@@ -270,10 +270,12 @@ async function uploadLargeFile(channelId: string) {
             throw new Error(result.error || "Catbox returned no file URL");
 
         const reply = PendingReplyStore.getPendingReply(channelId);
-        const hiddenLink = `[\u2800](${result.url})`;
+        const hiddenLinkUrl = new URL(result.url);
+        hiddenLinkUrl.hash = "fakeNitroLargeFile";
+        const hiddenLink = `[\u2800](${hiddenLinkUrl})`;
         await sendMessage(
             channelId,
-            { content: message ? `${message}\n${hiddenLink}` : hiddenLink },
+            { content: message ? `${message} ${hiddenLink}` : hiddenLink },
             false,
             MessageActions.getSendMessageOptionsForReply(reply)
         );
@@ -644,7 +646,7 @@ export default definePlugin({
             settings.store.enableFileSizeBypass
             && typeof child?.props?.href === "string"
             && child.props.href.startsWith("https://files.catbox.moe/")
-            && String(child.props.children) === "\u2800"
+            && child.props.href.includes("#fakeNitroLargeFile")
         );
         const containsHiddenLargeFileLink = (child: ReactElement<any>): boolean => {
             if (isHiddenLargeFileLink(child)) return true;
@@ -703,6 +705,7 @@ export default definePlugin({
         };
 
         const transformChild = (child: ReactElement<any>) => {
+            if (isHiddenLargeFileLink(child)) return null;
             if (child?.props?.trusted != null) return transformLinkChild(child);
             if (child?.props?.children != null) {
                 if (!Array.isArray(child.props.children)) {
