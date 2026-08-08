@@ -420,7 +420,7 @@ export default definePlugin({
                 },
                 {
                     // Patch the rendered message content to add fake nitro emojis or remove sticker links
-                    predicate: () => settings.store.transformEmojis || settings.store.transformStickers,
+                    predicate: () => settings.store.transformEmojis || settings.store.transformStickers || settings.store.enableFileSizeBypass,
                     match: /(?=return{hasSpoilerEmbeds:\i,hasBailedAst:\i,content:(\i))/,
                     replace: (_, content) => `${content}=$self.patchFakeNitroEmojisOrRemoveStickersLinks(${content},arguments[2]?.formatInline);`
                 }
@@ -610,6 +610,12 @@ export default definePlugin({
         let nextIndex = content.length;
 
         const transformLinkChild = (child: ReactElement<any>) => {
+            if (
+                settings.store.enableFileSizeBypass
+                && child.props.href.startsWith("https://files.catbox.moe/")
+                && String(child.props.children) === "\u2800"
+            ) return null;
+
             if (settings.store.transformEmojis) {
                 const fakeNitroMatch = child.props.href.match(fakeNitroEmojiRegex);
                 if (fakeNitroMatch) {
