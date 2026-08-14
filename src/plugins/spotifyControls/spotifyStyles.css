@@ -75,63 +75,7 @@
 
 .vc-spotify-button-row {
     justify-content: center;
-}
-
-.vc-spotify-controls-section {
     margin-top: 14px;
-}
-
-.vc-spotify-volume-row {
-    align-items: center;
-    margin-top: 8px;
-    gap: 4px;
-    color: var(--interactive-icon-default);
-}
-
-.vc-spotify-volume-row .vc-spotify-button-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-}
-
-#vc-spotify-volume-bar {
-    flex-grow: 1;
-    width: 100%;
-}
-
-#vc-spotify-volume-bar > [class*="slider"] {
-    flex-grow: 1;
-    width: 100%;
-    padding: 0 !important;
-}
-
-#vc-spotify-volume-bar > [class*="slider"] [class*="bar"] {
-    height: 3px !important;
-    top: calc(12px - 4px / 2 + var(--bar-offset));
-}
-
-#vc-spotify-volume-bar > [class*="slider"] [class*="barFill"] {
-    background-color: var(--interactive-icon-active);
-}
-
-#vc-spotify-volume-bar > [class*="slider"]:hover [class*="barFill"] {
-    background-color: var(--vc-spotify-green);
-}
-
-#vc-spotify-volume-bar > [class*="slider"] [class*="grabber"] {
-    height: 12px !important;
-    width: 12px !important;
-    margin-top: calc(13px/-2 + var(--bar-offset)/2);
-    margin-left: -0.5px;
-    background-color: var(--interactive-icon-active);
-    border-color: var(--interactive-icon-default);
-    color: var(--interactive-icon-default);
-    opacity: 0;
-    transition: opacity 0.1s;
-}
-
-#vc-spotify-volume-bar:hover > [class*="slider"] [class*="grabber"] {
-    opacity: 1;
 }
 
 .vc-spotify-secondary-song-info {
