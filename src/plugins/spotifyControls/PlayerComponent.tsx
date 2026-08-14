@@ -27,7 +27,7 @@ import { classNameFactory } from "@utils/css";
 import { copyWithToast, openImageModal } from "@utils/discord";
 import { classes } from "@utils/misc";
 import { formatDuration } from "@utils/text";
-import { ContextMenuApi, FluxDispatcher, Menu, React, useEffect, useState, useStateFromStores } from "@webpack/common";
+import { ContextMenuApi, FluxDispatcher, Menu, React, Slider, useEffect, useState, useStateFromStores } from "@webpack/common";
 
 import { settings } from ".";
 import { SeekBar } from "./SeekBar";
@@ -159,27 +159,17 @@ const setVolume = debounce((v: number) => {
 
 function VolumeControl() {
     const storeVolume = useStateFromStores([SpotifyStore], () => SpotifyStore.volume);
-    const [volume, setLocalVolume] = useState(storeVolume);
-
-    useEffect(() => {
-        setLocalVolume(storeVolume);
-    }, [storeVolume]);
-
-    const onChange = (v: number) => {
-        setLocalVolume(v);
-        setVolume(v);
-    };
 
     return (
         <Flex className={cl("volume-row")} gap="0">
             <VolumeIcon />
             <div id={cl("volume-bar")}>
-                <SeekBar
-                    initialValue={volume}
+                <Slider
+                    key={storeVolume}
+                    initialValue={storeVolume}
                     minValue={0}
                     maxValue={100}
-                    onValueChange={onChange}
-                    asValueChanges={onChange}
+                    onValueChange={setVolume}
                     onValueRender={v => `${Math.round(v)}%`}
                 />
             </div>
