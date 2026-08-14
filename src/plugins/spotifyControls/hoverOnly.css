@@ -1,4 +1,4 @@
-.vc-spotify-button-row {
+.vc-spotify-controls-section {
     height: 0;
     opacity: 0;
     pointer-events: none;
@@ -6,9 +6,9 @@
     transition-property: height;
 }
 
-#vc-spotify-player:hover .vc-spotify-button-row {
+#vc-spotify-player:hover .vc-spotify-controls-section {
     opacity: 1;
-    height: 32px;
+    height: 72px;
     pointer-events: auto;
 
     /* only transition opacity on show to prevent clipping */
