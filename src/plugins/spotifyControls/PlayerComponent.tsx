@@ -422,9 +422,9 @@ export function Player() {
         <div id={cl("player")} style={exportTrackImageStyle}>
             <Info track={track} />
             <SpotifySeekBar />
+            <VolumeControl />
             <div className={cl("controls-section")}>
                 <Controls />
-                <VolumeControl />
             </div>
         </div>
     );

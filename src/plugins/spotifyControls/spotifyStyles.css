@@ -78,14 +78,15 @@
 }
 
 .vc-spotify-controls-section {
-    margin-top: 14px;
+    margin-top: 8px;
 }
 
 .vc-spotify-volume-row {
     align-items: center;
-    margin-top: 8px;
-    gap: 4px;
+    margin-top: 10px;
+    gap: 6px;
     color: var(--interactive-icon-default);
+    min-height: 24px;
 }
 
 .vc-spotify-volume-row .vc-spotify-button-icon {
