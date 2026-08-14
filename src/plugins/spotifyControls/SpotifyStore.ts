@@ -122,14 +122,19 @@ export const SpotifyStore = proxyLazyWebpack(() => {
         }
 
         setVolume(percent: number) {
-            this._req("put", "/volume", {
+            const previousVolume = this.volume;
+
+            this.volume = percent;
+            this.emitChange();
+
+            return this._req("put", "/volume", {
                 query: {
                     volume_percent: Math.round(percent)
                 }
-
-            }).then(() => {
-                this.volume = percent;
+            }, false).catch((e: any) => {
+                this.volume = previousVolume;
                 this.emitChange();
+                console.error("[VencordSpotifyControls] Failed to set volume", e);
             });
         }
 
@@ -167,8 +172,8 @@ export const SpotifyStore = proxyLazyWebpack(() => {
             });
         }
 
-        _req(method: "post" | "get" | "put", route: string, data: any = {}) {
-            if (this.device?.is_active)
+        _req(method: "post" | "get" | "put", route: string, data: any = {}, targetDevice = true) {
+            if (targetDevice && this.device?.is_active)
                 (data.query ??= {}).device_id = this.device.id;
 
             const { socket } = SpotifySocket.getActiveSocketAndDevice();
