@@ -13,7 +13,7 @@ interface QuestValue {
     id: string;
     preview: boolean;
     config: Config;
-    userStatus: UserStatus;
+    userStatus: UserStatus | null;
     targetedContent: any[];
 }
 
@@ -31,6 +31,7 @@ interface UserStatus {
 }
 
 interface Progress {
+    [taskName: string]: QuestProgress | undefined;
     PLAY_ON_DESKTOP?: QuestProgress;
     STREAM_ON_DESKTOP?: QuestProgress;
     PLAY_ACTIVITY?: QuestProgress;
@@ -57,12 +58,12 @@ interface Config {
     startsAt: string;
     expiresAt: string;
     features: number[];
-    application?: Application;
+    application?: Application | null;
     assets: Assets;
     colors: Colors;
     messages: Messages;
-    taskConfig?: TaskConfig;
-    taskConfigV2?: TaskConfigV2;
+    taskConfig?: TaskConfig | null;
+    taskConfigV2?: TaskConfigV2 | null;
     rewardsConfig: RewardsConfig;
     sharePolicy: string;
 }
@@ -102,6 +103,7 @@ interface TaskConfigV2 {
 }
 
 interface Tasks {
+    [taskName: string]: QuestTask | undefined;
     PLAY_ON_DESKTOP?: QuestTask;
     STREAM_ON_DESKTOP?: QuestTask;
     PLAY_ACTIVITY?: QuestTask;
@@ -112,7 +114,7 @@ interface Tasks {
 interface QuestTask {
     type: string;
     target: number;
-    applications?: Array<{ id: string; }>;
+    applications?: Application[];
 }
 
 interface Messages {
