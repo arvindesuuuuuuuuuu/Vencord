@@ -34,6 +34,8 @@ for (const file of requiredFiles)
     await readFile(join(dist, file));
 
 const files = (await readdir(dist)).filter(file => /^(patcher|preload|renderer)\.(js|css)(\.map|\.LEGAL\.txt)?$/.test(file));
+const instructions = join(root, "scripts/installers/README.md");
+await copyFile(instructions, join(dist, "README.md"));
 
 async function download(url) {
     const response = await fetch(url);
@@ -53,6 +55,7 @@ try {
         for (const file of files)
             await copyFile(join(dist, file), join(directory, "dist", file));
         await copyFile(join(root, "LICENSE"), join(directory, "LICENSE"));
+        await copyFile(instructions, join(directory, "README.md"));
 
         const binary = platform === "windows" ? "VencordInstallerCli.exe" : "VencordInstallerCli-linux";
         const asset = release.assets.find(asset => asset.name === binary);

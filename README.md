@@ -50,22 +50,24 @@ From the root of this Git checkout, run:
 pnpm install --frozen-lockfile
 
 # Compile the desktop build for both platforms
-pnpm buildStandalone
+pnpm buildStandalone --disable-updater
 
 # Bundle that build with the Windows and Linux installer CLIs
 pnpm buildInstallers
 ```
 
-One packaging run creates both files:
+One packaging run creates both installer archives and a release README:
 
 | Platform | Output file | Launcher after extraction |
 | --- | --- | --- |
 | Windows (x86-64) | `dist/VencordInstaller-windows.zip` | `install.cmd` |
 | Linux (x86-64) | `dist/VencordInstaller-linux.tar.gz` | `sh ./install.sh` |
 
-Each archive contains the compiled build, installer CLI, launcher, license, and installation instructions. Re-run both build commands after changing the source so the archives include your changes. Building the archives does not install Vencord into Discord.
+`dist/README.md` contains Windows and Linux installation, uninstall, and update instructions. It is also included in each archive.
 
-The build workflow runs the same packaging command on Ubuntu and attaches both archives to the `devbuild` release automatically when its release conditions are met.
+Each archive contains the compiled build, installer CLI, launcher, license, and installation instructions. Re-run both build commands after changing the source so the archives include your changes. Building the archives does not install Vencord into Discord. Automatic updates are disabled for these releases; download the latest archive to update.
+
+The build workflow runs the same packaging command on Ubuntu and attaches only the two installer archives and `README.md` to the `devbuild` release. The installation instructions also appear in the release description.
 
 ### Linux
 

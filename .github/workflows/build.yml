@@ -39,21 +39,11 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            - name: Build web
-              run: pnpm buildWebStandalone
-
             - name: Build
-              run: pnpm build --standalone
+              run: pnpm build --standalone --disable-updater
 
             - name: Package Windows and Linux installers
               run: pnpm buildInstallers
-
-            - name: Generate plugin list
-              run: pnpm generatePluginJson dist/plugins.json dist/plugin-readmes.json
-
-            - name: Clean up obsolete files
-              run: |
-                  rm -rf dist/*-unpacked dist/vendor Vencord.user.css vencordDesktopRenderer.css vencordDesktopRenderer.css.map
 
             - name: Get some values needed for the release
               id: release_values
@@ -71,7 +61,10 @@ jobs:
                   gh release delete devbuild --cleanup-tag -y || true
                   
                   # 2. Create a fresh release named 'devbuild' with the new files
-                  gh release create devbuild dist/* \
+                  gh release create devbuild \
+                    dist/VencordInstaller-windows.zip \
+                    dist/VencordInstaller-linux.tar.gz \
+                    dist/README.md \
                     --title "DevBuild $RELEASE_TAG" \
-                    --notes "Automated build from commit $RELEASE_TAG" \
+                    --notes-file dist/README.md \
                     --target $GITHUB_SHA
