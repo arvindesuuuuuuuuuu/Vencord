@@ -22,7 +22,43 @@ The cutest Discord client mod
 
 ## Installing / Uninstalling
 
-Visit https://vencord.dev/download
+Visit https://vencord.dev/download for downloads across all platforms.
+
+### Linux
+
+#### Quick Install
+
+Run the following command in your terminal and follow the prompts:
+
+```sh
+sh -c "$(curl -sS https://vencord.dev/install.sh)"
+```
+
+Alternatively, download [VencordInstallerCli-linux](https://github.com/Vencord/Installer/releases/latest/download/VencordInstallerCli-linux), make it executable (`chmod +x VencordInstallerCli-linux`), and run it.
+
+> [!NOTE]
+> Discord installed via Snap is not supported. Use the official `.deb` package or the [Flatpak](https://flathub.org/apps/details/com.discordapp.Discord).
+
+#### From Source (Development)
+
+To build and inject Vencord directly from this repository:
+
+```sh
+# Install dependencies
+pnpm install
+
+# Build Vencord
+pnpm build
+
+# Inject into Discord
+pnpm inject
+```
+
+To uninject:
+
+```sh
+pnpm uninject
+```
 
 ## Join our Support/Community Server
 

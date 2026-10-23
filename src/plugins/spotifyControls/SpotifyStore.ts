@@ -19,7 +19,7 @@
 import { isPluginEnabled } from "@api/PluginManager";
 import OpenInAppPlugin from "@plugins/openInApp";
 import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
-import { Flux, FluxDispatcher } from "@webpack/common";
+import { Flux, FluxDispatcher, showToast, Toasts } from "@webpack/common";
 
 import { settings } from ".";
 
@@ -61,9 +61,13 @@ interface PlayerState {
     shuffle: boolean;
 }
 
-interface Device {
+export interface Device {
     id: string;
     is_active: boolean;
+    name?: string;
+    type?: string;
+    supports_volume?: boolean;
+    volume_percent?: number;
 }
 
 type Repeat = "off" | "track" | "context";
@@ -84,6 +88,7 @@ export const SpotifyStore = proxyLazyWebpack(() => {
 
         public track: Track | null = null;
         public device: Device | null = null;
+        public devices: Device[] = [];
         public isPlaying = false;
         public repeat: Repeat = "off";
         public shuffle = false;
@@ -122,13 +127,32 @@ export const SpotifyStore = proxyLazyWebpack(() => {
         }
 
         setVolume(percent: number) {
-            this._req("put", "/volume", {
-                query: {
-                    volume_percent: Math.round(percent)
-                }
+            if (this.device?.supports_volume === false) {
+                showToast(`Volume control is not supported on ${this.device.name ?? "this device"}`, Toasts.Type.FAILURE);
+                return Promise.resolve();
+            }
 
-            }).then(() => {
-                this.volume = percent;
+            const vol = Math.max(0, Math.min(100, Math.round(percent)));
+            const prev = this.volume;
+            this.volume = vol;
+            this.emitChange();
+
+            return this._req("put", "/volume", {
+                query: {
+                    volume_percent: vol
+                }
+            }).catch((err: any) => {
+                console.error("[SpotifyControls] Failed to set volume:", err?.status, err?.body, err?.text, err);
+                const status = err?.status;
+                const message = err?.body?.error?.message;
+                if (status === 403) {
+                    showToast(`Volume control is not supported on ${this.device?.name ?? "this device"}`, Toasts.Type.FAILURE);
+                } else if (status === 404) {
+                    showToast("No active Spotify playback device found", Toasts.Type.FAILURE);
+                } else if (message) {
+                    showToast(`Spotify: ${message}`, Toasts.Type.FAILURE);
+                }
+                this.volume = prev;
                 this.emitChange();
             });
         }
@@ -168,31 +192,67 @@ export const SpotifyStore = proxyLazyWebpack(() => {
         }
 
         _req(method: "post" | "get" | "put", route: string, data: any = {}) {
-            if (this.device?.is_active)
-                (data.query ??= {}).device_id = this.device.id;
+            const socketAndDevice = SpotifySocket.getActiveSocketAndDevice();
+            const socket = socketAndDevice?.socket;
+            const activeDevice = (this.device?.is_active ? this.device : socketAndDevice?.device) as Device | undefined;
 
-            const { socket } = SpotifySocket.getActiveSocketAndDevice();
+            if (activeDevice?.id && activeDevice.is_active) {
+                (data.query ??= {}).device_id = activeDevice.id;
+            }
+
+            if (!socket) {
+                console.error("[SpotifyControls] No active socket found in SpotifySocket!", socketAndDevice);
+                return Promise.reject(new Error("No active Spotify socket"));
+            }
+
+            let url = API_BASE + route;
+            if (data.query && Object.keys(data.query).length > 0) {
+                const searchParams = new URLSearchParams();
+                for (const [key, value] of Object.entries(data.query)) {
+                    if (value !== undefined && value !== null) {
+                        searchParams.set(key, String(value));
+                    }
+                }
+                const queryString = searchParams.toString();
+                if (queryString) {
+                    url += (url.includes("?") ? "&" : "?") + queryString;
+                }
+            }
+
+            console.log("[SpotifyControls] Sending _req:", method, url, "data:", JSON.stringify(data), "device:", JSON.stringify(activeDevice));
+
             return SpotifyAPI[method](socket.accountId, socket.accessToken, {
-                url: API_BASE + route,
+                url,
                 ...data
             });
         }
     }
 
     const store = new SpotifyStore(FluxDispatcher, {
-        SPOTIFY_PLAYER_STATE(e: PlayerState) {
+        SPOTIFY_PLAYER_STATE(e: any) {
+            console.log("[SpotifyControls] SPOTIFY_PLAYER_STATE:", JSON.stringify(e));
             store.track = e.track;
-            store.device = e.device ?? null;
+            if (e.device) {
+                store.device = e.device;
+            }
             store.isPlaying = e.isPlaying ?? false;
-            store.volume = e.volumePercent ?? 0;
+            store.volume = e.volumePercent ?? e.device?.volume_percent ?? store.volume ?? 0;
             store.repeat = e.actual_repeat || "off";
             store.shuffle = e.shuffle ?? false;
             store.position = e.position ?? 0;
             store.isSettingPosition = false;
             store.emitChange();
         },
-        SPOTIFY_SET_DEVICES({ devices }: { devices: Device[]; }) {
-            store.device = devices.find(d => d.is_active) ?? devices[0] ?? null;
+        SPOTIFY_SET_DEVICES({ devices }: { devices: any[]; }) {
+            console.log("[SpotifyControls] SPOTIFY_SET_DEVICES:", JSON.stringify(devices));
+            store.devices = devices ?? [];
+            const active = devices.find(d => d.is_active) ?? devices[0] ?? null;
+            if (active) {
+                store.device = active;
+                if (active.volume_percent != null) {
+                    store.volume = active.volume_percent;
+                }
+            }
             store.emitChange();
         }
     });

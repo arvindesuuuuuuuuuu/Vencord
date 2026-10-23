@@ -1,4 +1,5 @@
-.vc-spotify-button-row {
+.vc-spotify-button-row,
+.vc-spotify-volume-row {
     height: 0;
     opacity: 0;
     pointer-events: none;
@@ -6,11 +7,22 @@
     transition-property: height;
 }
 
-#vc-spotify-player:hover .vc-spotify-button-row {
+.vc-spotify-volume-row {
+    margin-top: 0;
+    overflow: hidden;
+}
+
+#vc-spotify-player:hover .vc-spotify-button-row,
+#vc-spotify-player:hover .vc-spotify-volume-row {
     opacity: 1;
     height: 32px;
     pointer-events: auto;
 
     /* only transition opacity on show to prevent clipping */
     transition-property: height, opacity;
+}
+
+#vc-spotify-player:hover .vc-spotify-volume-row {
+    margin-top: 10px;
+    overflow: visible;
 }

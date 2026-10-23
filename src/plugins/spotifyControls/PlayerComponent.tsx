@@ -27,7 +27,7 @@ import { classNameFactory } from "@utils/css";
 import { copyWithToast, openImageModal } from "@utils/discord";
 import { classes } from "@utils/misc";
 import { formatDuration } from "@utils/text";
-import { ContextMenuApi, FluxDispatcher, Menu, React, useEffect, useState, useStateFromStores } from "@webpack/common";
+import { ContextMenuApi, FluxDispatcher, Menu, React, showToast, Toasts, Tooltip, useCallback, useEffect, useRef, useState, useStateFromStores } from "@webpack/common";
 
 import { settings } from ".";
 import { SeekBar } from "./SeekBar";
@@ -60,6 +60,15 @@ const SkipPrev = Svg("M7 6c.55 0 1 .45 1 1v10c0 .55-.45 1-1 1s-1-.45-1-1V7c0-.55
 const SkipNext = Svg("M7.58 16.89l5.77-4.07c.56-.4.56-1.24 0-1.63L7.58 7.11C6.91 6.65 6 7.12 6 7.93v8.14c0 .81.91 1.28 1.58.82zM16 7v10c0 .55.45 1 1 1s1-.45 1-1V7c0-.55-.45-1-1-1s-1 .45-1 1z", "next");
 const Repeat = Svg("M7 7h10v1.79c0 .45.54.67.85.35l2.79-2.79c.2-.2.2-.51 0-.71l-2.79-2.79c-.31-.31-.85-.09-.85.36V5H6c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1s1-.45 1-1V7zm10 10H7v-1.79c0-.45-.54-.67-.85-.35l-2.79 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.31.31.85.09.85-.36V19h11c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1s-1 .45-1 1v3z", "repeat");
 const Shuffle = Svg("M10.59 9.17L6.12 4.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l4.46 4.46 1.42-1.4zm4.76-4.32l1.19 1.19L4.7 17.88c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L17.96 7.46l1.19 1.19c.31.31.85.09.85-.36V4.5c0-.28-.22-.5-.5-.5h-3.79c-.45 0-.67.54-.36.85zm-.52 8.56l-1.41 1.41 3.13 3.13-1.2 1.2c-.31.31-.09.85.36.85h3.79c.28 0 .5-.22.5-.5v-3.79c0-.45-.54-.67-.85-.35l-1.19 1.19-3.13-3.14z", "shuffle");
+const VolumeUp = Svg("M3 10v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9H4c-.55 0-1 .45-1 1zm13.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 4.45v.2c0 .38.25.71.6.85C17.18 6.53 19 9.06 19 12s-1.82 5.47-4.4 6.5c-.36.14-.6.47-.6.85v.2c0 .63.63 1.07 1.21.85C18.6 19.11 21 15.84 21 12s-2.4-7.11-5.79-8.4c-.58-.23-1.21.22-1.21.85z", "volume-up");
+const VolumeDown = Svg("M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM7 10H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71V6.41c0-.89-1.08-1.34-1.71-.71L7 9z", "volume-down");
+const VolumeOff = Svg("M3.15 3.85a.996.996 0 0 0 0 1.41l5.56 5.56L7 12H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71v-4.17l4.18 4.18c-.49.37-1.02.68-1.6.91-.36.15-.58.5-.58.88 0 .64.63 1.09 1.22.86.84-.33 1.61-.79 2.27-1.34l1.45 1.45a.996.996 0 1 0 1.41-1.41L4.56 3.85a.996.996 0 0 0-1.41 0zM12 4.71c0-.89-1.08-1.34-1.71-.71L8.53 5.76l3.47 3.47V4.71zm4.5 7.29c0-.7-.18-1.36-.49-1.95l1.53-1.53c.6.98.96 2.12.96 3.48 0 1.77-1.02 3.29-2.5 4.03v-1.92c.3-.5.5-1.09.5-2.11z", "volume-off");
+
+function VolumeIcon({ volume }: { volume: number; }) {
+    if (volume === 0) return <VolumeOff />;
+    if (volume <= 50) return <VolumeDown />;
+    return <VolumeUp />;
+}
 
 function Button(props: React.ButtonHTMLAttributes<HTMLButtonElement>) {
     return (
@@ -212,9 +221,82 @@ function SpotifySeekBar() {
     );
 }
 
+const setVolumeDebounced = debounce((v: number) => {
+    SpotifyStore.setVolume(v);
+}, 200);
+
+function VolumeBar({
+    volume,
+    disabled = false,
+    disabledReason,
+    onChange,
+    onMuteToggle
+}: {
+    volume: number;
+    disabled?: boolean;
+    disabledReason?: string;
+    onChange: (val: number) => void;
+    onMuteToggle: () => void;
+}) {
+    const row = (
+        <div
+            id={cl("volume-row")}
+            className={classes(cl("volume-row"), disabled && cl("volume-disabled"))}
+            title={disabled ? disabledReason : undefined}
+        >
+            <Button
+                className={classes(cl("button"), cl("volume-button"), cl("volume"))}
+                onClick={disabled ? () => disabledReason && showToast(disabledReason, Toasts.Type.FAILURE) : onMuteToggle}
+                disabled={disabled}
+                aria-label={disabled ? (disabledReason ?? "Volume control unavailable") : volume === 0 ? "Unmute" : "Mute"}
+                title={disabled ? (disabledReason ?? "Volume control unavailable") : volume === 0 ? "Unmute" : "Mute"}
+            >
+                <VolumeIcon volume={volume} />
+            </Button>
+            <div id={cl("volume-slider")}>
+                <SeekBar
+                    initialValue={volume}
+                    minValue={0}
+                    maxValue={100}
+                    disabled={disabled}
+                    onValueChange={disabled ? undefined : onChange}
+                    asValueChanges={disabled ? undefined : onChange}
+                    onValueRender={v => `${Math.round(v)}%`}
+                />
+            </div>
+            <Span
+                size="xs"
+                weight="medium"
+                className={cl("volume-text")}
+                aria-label="Volume percentage"
+            >
+                {Math.round(volume)}%
+            </Span>
+        </div>
+    );
+
+    if (disabled && disabledReason) {
+        return (
+            <Tooltip text={disabledReason}>
+                {props => (
+                    <div {...props} className={cl("volume-tooltip-wrapper")}>
+                        {row}
+                    </div>
+                )}
+            </Tooltip>
+        );
+    }
+
+    return row;
+}
+
 
 function AlbumContextMenu({ track }: { track: Track; }) {
-    const volume = useStateFromStores([SpotifyStore], () => SpotifyStore.volume);
+    const [volume, device] = useStateFromStores(
+        [SpotifyStore],
+        () => [SpotifyStore.volume, SpotifyStore.device]
+    );
+    const supportsVolume = device?.supports_volume !== false;
 
     return (
         <Menu.Menu
@@ -242,7 +324,7 @@ function AlbumContextMenu({ track }: { track: Track; }) {
             <Menu.MenuControlItem
                 id="spotify-volume"
                 key="spotify-volume"
-                label="Volume"
+                label={supportsVolume ? "Volume" : `Volume (${device?.name ?? "device"} unsupported)`}
                 control={(props, ref) => (
                     <Menu.MenuSliderControl
                         {...props}
@@ -250,7 +332,8 @@ function AlbumContextMenu({ track }: { track: Track; }) {
                         value={volume}
                         minValue={0}
                         maxValue={100}
-                        onChange={debounce((v: number) => SpotifyStore.setVolume(v))}
+                        disabled={!supportsVolume}
+                        onChange={supportsVolume ? debounce((v: number) => SpotifyStore.setVolume(v)) : undefined}
                     />
                 )}
             />
@@ -359,15 +442,84 @@ export function Player() {
         [SpotifyStore],
         () => SpotifyStore.device,
         null,
-        (prev, next) => prev?.id === next?.id
+        (prev, next) => prev?.id === next?.id && prev?.supports_volume === next?.supports_volume
     );
 
     const isPlaying = useStateFromStores([SpotifyStore], () => SpotifyStore.isPlaying);
     const [shouldHide, setShouldHide] = useState(false);
 
+    const supportsVolume = device?.supports_volume !== false;
+    const disabledReason = !supportsVolume
+        ? `Volume control is not supported on ${device?.name ?? "this device"}`
+        : undefined;
+
+    const storeVolume = useStateFromStores([SpotifyStore], () => SpotifyStore.volume);
+    const [volume, setVolume] = useState(storeVolume);
+    const volumeRef = useRef(volume);
+    volumeRef.current = volume;
+
+    const lastNonZeroVolumeRef = useRef(storeVolume > 0 ? storeVolume : 50);
+
+    useEffect(() => {
+        if (storeVolume > 0) {
+            lastNonZeroVolumeRef.current = storeVolume;
+        }
+        setVolume(storeVolume);
+    }, [storeVolume]);
+
+    const changeVolume = useCallback((newVol: number, immediate = false) => {
+        if (!supportsVolume) {
+            if (disabledReason) showToast(disabledReason, Toasts.Type.FAILURE);
+            return;
+        }
+        const clamped = Math.min(100, Math.max(0, Math.round(newVol)));
+        setVolume(clamped);
+        volumeRef.current = clamped;
+        if (clamped > 0) {
+            lastNonZeroVolumeRef.current = clamped;
+        }
+        if (immediate) {
+            SpotifyStore.setVolume(clamped);
+        } else {
+            setVolumeDebounced(clamped);
+        }
+    }, [supportsVolume, disabledReason]);
+
+    const onMuteToggle = useCallback(() => {
+        if (!supportsVolume) {
+            if (disabledReason) showToast(disabledReason, Toasts.Type.FAILURE);
+            return;
+        }
+        if (volumeRef.current > 0) {
+            lastNonZeroVolumeRef.current = volumeRef.current;
+            changeVolume(0, true);
+        } else {
+            const restore = lastNonZeroVolumeRef.current || 50;
+            changeVolume(restore, true);
+        }
+    }, [supportsVolume, disabledReason, changeVolume]);
+
+    const { showVolumeSlider, mouseScrollVolume } = settings.use(["showVolumeSlider", "mouseScrollVolume"]);
+    const playerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const el = playerRef.current;
+        if (!el || !mouseScrollVolume || !supportsVolume) return;
+
+        const onWheel = (e: WheelEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const delta = e.deltaY < 0 ? 5 : -5;
+            changeVolume(volumeRef.current + delta);
+        };
+
+        el.addEventListener("wheel", onWheel, { passive: false });
+        return () => el.removeEventListener("wheel", onWheel);
+    }, [mouseScrollVolume, supportsVolume, changeVolume]);
+
     // Hide player after 5 minutes of inactivity
 
-    React.useEffect(() => {
+    useEffect(() => {
         setShouldHide(false);
         if (!isPlaying) {
             const timeout = setTimeout(() => setShouldHide(true), 1000 * 60 * 5);
@@ -383,10 +535,19 @@ export function Player() {
     } as React.CSSProperties;
 
     return (
-        <div id={cl("player")} style={exportTrackImageStyle}>
+        <div id={cl("player")} style={exportTrackImageStyle} ref={playerRef}>
             <Info track={track} />
             <SpotifySeekBar />
             <Controls />
+            {showVolumeSlider && (
+                <VolumeBar
+                    volume={volume}
+                    disabled={!supportsVolume}
+                    disabledReason={disabledReason}
+                    onChange={changeVolume}
+                    onMuteToggle={onMuteToggle}
+                />
+            )}
         </div>
     );
 }

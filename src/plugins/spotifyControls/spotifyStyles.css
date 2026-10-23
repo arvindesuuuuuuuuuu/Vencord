@@ -159,26 +159,31 @@
     margin-bottom: 5px;
 }
 
-#vc-spotify-progress-bar > [class*="slider"] {
+#vc-spotify-progress-bar > [class*="slider"],
+#vc-spotify-volume-slider > [class*="slider"] {
     flex-grow: 1;
     width: 100%;
     padding: 0 !important;
 }
 
-#vc-spotify-progress-bar > [class*="slider"] [class*="bar"] {
+#vc-spotify-progress-bar > [class*="slider"] [class*="bar"],
+#vc-spotify-volume-slider > [class*="slider"] [class*="bar"] {
     height: 3px !important;
     top: calc(12px - 4px / 2 + var(--bar-offset));
 }
 
-#vc-spotify-progress-bar > [class*="slider"] [class*="barFill"] {
+#vc-spotify-progress-bar > [class*="slider"] [class*="barFill"],
+#vc-spotify-volume-slider > [class*="slider"] [class*="barFill"] {
     background-color: var(--interactive-icon-active);
 }
 
-#vc-spotify-progress-bar > [class*="slider"]:hover [class*="barFill"] {
+#vc-spotify-progress-bar > [class*="slider"]:hover [class*="barFill"],
+#vc-spotify-volume-slider > [class*="slider"]:hover [class*="barFill"] {
     background-color: var(--vc-spotify-green);
 }
 
-#vc-spotify-progress-bar > [class*="slider"] [class*="grabber"] {
+#vc-spotify-progress-bar > [class*="slider"] [class*="grabber"],
+#vc-spotify-volume-slider > [class*="slider"] [class*="grabber"] {
     /* these importants are necessary, it applies a width and height through inline styles */
     height: 16px !important;
     width: 16px !important;
@@ -191,7 +196,8 @@
     transition: opacity 0.1s;
 }
 
-#vc-spotify-progress-bar:hover > [class*="slider"] [class*="grabber"] {
+#vc-spotify-progress-bar:hover > [class*="slider"] [class*="grabber"],
+#vc-spotify-volume-slider:hover > [class*="slider"] [class*="grabber"] {
     opacity: 1;
 }
 
@@ -218,4 +224,61 @@
 .vc-spotify-fallback {
     padding: 0.5em;
     color: var(--text-default);
+}
+
+#vc-spotify-volume-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.vc-spotify-volume-button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.vc-spotify-volume-button .vc-spotify-button-icon {
+    width: 20px;
+    height: 20px;
+}
+
+#vc-spotify-volume-slider {
+    flex-grow: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: var(--text-default);
+}
+
+
+.vc-spotify-volume-text {
+    font-size: 11px;
+    font-family: var(--font-code);
+    color: var(--text-muted);
+    min-width: 32px;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.vc-spotify-volume-disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed;
+}
+
+.vc-spotify-volume-disabled * {
+    cursor: not-allowed !important;
+}
+
+.vc-spotify-volume-disabled #vc-spotify-volume-slider {
+    pointer-events: none;
+}
+
+.vc-spotify-volume-tooltip-wrapper {
+    width: 100%;
 }

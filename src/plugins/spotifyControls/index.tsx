@@ -41,6 +41,16 @@ export const settings = definePluginSettings({
         type: OptionType.BOOLEAN,
         description: "Restart currently playing track when pressing the previous button if playtime is >3s",
         default: true
+    },
+    showVolumeSlider: {
+        type: OptionType.BOOLEAN,
+        description: "Show a volume slider in the player",
+        default: true
+    },
+    mouseScrollVolume: {
+        type: OptionType.BOOLEAN,
+        description: "Adjust volume by scrolling mouse wheel over the player",
+        default: true
     }
 });
 
