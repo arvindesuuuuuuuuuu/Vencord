@@ -1,3 +1,7 @@
+.vc-file-upload-hidden-link {
+    display: none;
+}
+
 .vc-file-upload-progress-wrap {
     margin-top: 8px;
     border-radius: 8px;

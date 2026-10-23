@@ -18,6 +18,7 @@ import { ChannelStore, DraftStore, DraftType, FluxDispatcher, Menu, PermissionsB
 
 import { settings } from "./settings";
 import { serviceLabels, ServiceType } from "./types";
+import { shouldHideUploadLink, UploadLinkHider } from "./UploadLinkHider";
 import { getMediaUrl } from "./utils/getMediaUrl";
 import { cancelCurrentUpload, getUploadState, isConfigured, isFileTypeAllowed, logger, subscribeUploadState, uploadFile, uploadPickedFile, uploadProvidedFiles } from "./utils/upload";
 const cl = classNameFactory("vc-file-upload-");
@@ -371,6 +372,10 @@ export default definePlugin({
     authors: [Devs.ScattrdBlade, Devs.creations, { name: "Key", id: 1230319937155760131n }],
     enabledByDefault: true,
     settings,
+    renderMessageAccessory({ message }) {
+        if (!shouldHideUploadLink(message, settings.store.corsProxyUrl)) return null;
+        return <UploadLinkHider messageId={message.id} />;
+    },
     patches: [
         {
             find: ".CREATE_FORUM_POST||",
