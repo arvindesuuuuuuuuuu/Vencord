@@ -15,6 +15,7 @@ import { normalizeCorsProxyUrl, toProxiedUrl } from "../constants";
 import { settings } from "../settings";
 import { fallbackServiceOrder, serviceLabels, ServiceType, ShareXUploaderConfig, UploadResponse } from "../types";
 import { convertApngToGif } from "./apngToGif";
+import { formatUploadLink } from "./formatUploadLink";
 import { getExtensionFromBytes, getExtensionFromMime, getMimeFromExtension, getUrlExtension } from "./getMediaUrl";
 import { isS3Configured, uploadToS3 } from "./s3";
 import { parseShareXConfig, resolveShareXTemplate } from "./sharex";
@@ -1312,7 +1313,7 @@ function getFilenameExtension(filename: string): string | undefined {
     return ext.length <= 10 ? ext : undefined;
 }
 
-async function notifyUploadSuccess(finalUrl: string, forceSend?: boolean, displayName?: string): Promise<void> {
+async function notifyUploadSuccess(finalUrl: string, forceSend?: boolean, displayName?: string, mediaType?: string): Promise<void> {
     if (settings.store.autoCopy) {
         if (!finalUrl || !finalUrl.trim()) {
             showToast("Upload successful, but no URL was available to copy", Toasts.Type.MESSAGE);
@@ -1332,14 +1333,13 @@ async function notifyUploadSuccess(finalUrl: string, forceSend?: boolean, displa
 
     const autoSend = forceSend || Boolean((settings.store as { autoSend?: boolean; }).autoSend);
     if (autoSend) {
-        const { autoFormat, displayOriginalFilename } = settings.store as { autoFormat?: boolean; displayOriginalFilename?: boolean; };
-        let text = finalUrl;
-        if (displayOriginalFilename && displayName) {
-            text = `[${displayName.replace(/[[\]]/g, "")}](${finalUrl})`;
-        } else if (autoFormat) {
-            text = `<${finalUrl}>`;
-        }
-        insertTextIntoChatInputBox(text);
+        insertTextIntoChatInputBox(formatUploadLink(finalUrl, {
+            autoFormat: settings.store.autoFormat,
+            displayOriginalFilename: settings.store.displayOriginalFilename,
+            hideMediaLinks: settings.store.hideMediaLinks,
+            displayName,
+            mediaType
+        }));
     }
 }
 
@@ -1516,7 +1516,7 @@ async function uploadPreparedBlob(blob: Blob, sourceUrl?: string, forceSend?: bo
     setUploadState({ fileName: filename, status: "File ready, starting upload...", percent: 4 });
     const uploadedUrl = await uploadWithFallbacks(normalizedBlob, filename, primary);
     const finalUrl = applyEmbedProxy(finalizeUploadedUrl(uploadedUrl));
-    await notifyUploadSuccess(finalUrl, forceSend, originalFilename || filename);
+    await notifyUploadSuccess(finalUrl, forceSend, originalFilename || filename, normalizedBlob.type);
     return finalUrl;
 }
 

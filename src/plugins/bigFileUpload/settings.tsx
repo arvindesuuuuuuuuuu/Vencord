@@ -232,6 +232,12 @@ export const settings = definePluginSettings({
         default: false,
         hidden: true
     },
+    hideMediaLinks: {
+        type: OptionType.BOOLEAN,
+        description: "Use an invisible masked link for uploaded images and videos, including on standard Discord clients",
+        default: true,
+        hidden: true
+    },
     bypassDiscordUpload: {
         type: OptionType.BOOLEAN,
         description: "Bypass Discord uploads and use BigFileUpload instead.",
@@ -1149,6 +1155,13 @@ export function SettingsComponent() {
                     description="When inserting uploaded file URLs into chatbox, wrap them in angle brackets to avoid Discord embedding."
                     checked={store.autoFormat}
                     onChange={v => store.autoFormat = v}
+                />
+
+                <SettingSwitch
+                    name="Hide Media Link Text"
+                    description="Use an invisible link label for new images and videos on standard Discord. Link as Filename and Prevent Discord Embeds take priority."
+                    checked={store.hideMediaLinks}
+                    onChange={v => store.hideMediaLinks = v}
                 />
 
                 <SettingSwitch

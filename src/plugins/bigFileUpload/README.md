@@ -9,6 +9,8 @@ You can upload in several ways: the `Upload to Host` option in the `+` attachmen
 
 If a host fails or isn't configured, it automatically falls back to the next one (no-key hosts first by default), so an upload almost always lands. Enable Nitro-aware mode to let Discord handle anything under your current upload limit (server upload limit included) and only bypass for larger files. The maximum file size depends on the host you choose. Extras include converting APNG to GIF, preserving original filenames, posting the link as clickable filename text, auto-copying the link, stripping query parameters, and an optional embed proxy for inline video previews.
 
+**Hide Media Link Text** is enabled by default. New image and video uploads use a masked link with an invisible label, so the visible URL does not depend on the recipient using Vencord. Ordinary file links stay visible. **Link as Filename** and **Prevent Discord Embeds** take priority; existing messages and copied URLs are unchanged. Media previews still depend on Discord and the upload host.
+
 ## Supported Uploaders
 
 **No account or API key required** (work anonymously):
