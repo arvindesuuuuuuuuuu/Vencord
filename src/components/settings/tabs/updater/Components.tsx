@@ -12,7 +12,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { relaunch } from "@utils/native";
 import { changes, checkForUpdates, update, updateError } from "@utils/updater";
-import { Button, ConfirmModal,Forms, openModal, React, Toasts, useState } from "@webpack/common";
+import { Button, ConfirmModal,Forms, openModal, React, showToast, Toasts, useState } from "@webpack/common";
 
 import { runWithDispatch } from "./runWithDispatch";
 
@@ -76,7 +76,11 @@ export function Updatable(props: CommonProps) {
 
     return (
         <>
-            {!updates && updateError ? (
+            {isChecking ? (
+                <Forms.FormText className={Margins.bottom8} role="status">
+                    Checking for updates…
+                </Forms.FormText>
+            ) : !updates && updateError ? (
                 <>
                     <Forms.FormText>Failed to check updates. Check the console for more info</Forms.FormText>
                     <ErrorCard style={{ padding: "1em" }}>
@@ -125,25 +129,26 @@ export function Updatable(props: CommonProps) {
                 <Button
                     disabled={isUpdating || isChecking}
                     onClick={runWithDispatch(setIsChecking, async () => {
+                        showToast("Checking for updates…", Toasts.Type.MESSAGE, {
+                            position: Toasts.Position.TOP
+                        });
                         const outdated = await checkForUpdates();
 
                         if (outdated) {
                             setUpdates(changes);
+                            showToast(changes.length === 1 ? "Found 1 update!" : `Found ${changes.length} updates!`, Toasts.Type.SUCCESS, {
+                                position: Toasts.Position.TOP
+                            });
                         } else {
                             setUpdates([]);
 
-                            Toasts.show({
-                                message: "No updates found!",
-                                id: Toasts.genId(),
-                                type: Toasts.Type.MESSAGE,
-                                options: {
-                                    position: Toasts.Position.BOTTOM
-                                }
+                            showToast("You're up to date. No updates found!", Toasts.Type.SUCCESS, {
+                                position: Toasts.Position.TOP
                             });
                         }
                     })}
                 >
-                    Check for Updates
+                    {isChecking ? "Checking…" : "Check for Updates"}
                 </Button>
             </Flex>
         </>
