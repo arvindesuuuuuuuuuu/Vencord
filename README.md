@@ -31,7 +31,9 @@ This fork's `devbuild` release includes installers with its compiled desktop bui
 - **Windows (x86-64):** download `VencordInstaller-windows.zip`, extract all files to a permanent folder, and double-click `install.cmd`.
 - **Linux (x86-64):** download `VencordInstaller-linux.tar.gz`, extract it to a permanent folder, and run `sh ./install.sh` inside that folder. If access to Discord requires administrator privileges, run `sudo sh ./install.sh`.
 
-Fully close Discord first, then choose **Install**, **Reinstall**, or **Uninstall** in the launcher and select its installation when prompted. Keep the extracted folder in place; Discord loads the bundled build from there. Node.js and pnpm are not required. To uninstall directly, run `install.cmd --uninstall` on Windows or `sh ./install.sh --uninstall` on Linux before deleting the folder. To reinstall directly, use `--install` instead.
+Choose **Install**, **Reinstall**, or **Uninstall**, then select **Stable**, **PTB**, or **Canary**. The launcher closes that Discord branch before applying changes and starts it after a successful install or reinstall. **Back** and **Exit** are available before applying changes and afterward. If running the Linux installer with `sudo`, start Discord yourself as your normal user afterward.
+
+Keep the extracted folder in place; Discord loads the bundled build from there. Node.js and pnpm are not required. To uninstall directly, run `install.cmd --uninstall` on Windows or `sh ./install.sh --uninstall` on Linux before deleting the folder. To reinstall directly, use `--install` instead. Direct commands require you to quit and restart Discord yourself.
 
 #### Building the installer archives
 

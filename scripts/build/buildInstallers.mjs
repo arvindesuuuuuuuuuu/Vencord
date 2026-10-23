@@ -68,8 +68,10 @@ try {
         await copyFile(join(root, "scripts/installers", launcher), join(directory, launcher));
         await chmod(join(directory, launcher), 0o755);
         await writeFile(join(directory, "README.txt"), [
-            "Fully close Discord before installing.",
-            `Run ${launcher}, choose Install, Reinstall, or Uninstall, then select your Discord installation.`,
+            `Run ${launcher}, choose Install, Reinstall, or Uninstall, then select Stable, PTB, or Canary.`,
+            "Use Back to return or Exit to leave. Continue closes the selected Discord branch before applying changes.",
+            "After a successful install or reinstall, Discord starts automatically (except when running as root).",
+            "For direct CLI commands, fully close Discord yourself and restart it afterward.",
             "Extract the entire archive first. Keep this folder in a permanent location:",
             "Discord loads Vencord directly from its dist folder. Do not delete or move it.",
             `To uninstall, run ${launcher} --uninstall before removing this folder.`,
