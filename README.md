@@ -24,6 +24,49 @@ The cutest Discord client mod
 
 Visit https://vencord.dev/download for downloads across all platforms.
 
+### Windows and Linux release installers
+
+This fork's `devbuild` release includes installers with its compiled desktop build:
+
+- **Windows (x86-64):** download `VencordInstaller-windows.zip`, extract all files to a permanent folder, and double-click `install.cmd`.
+- **Linux (x86-64):** download `VencordInstaller-linux.tar.gz`, extract it to a permanent folder, and run `sh ./install.sh` inside that folder. If access to Discord requires administrator privileges, run `sudo sh ./install.sh`.
+
+Fully close Discord first, then select its installation when prompted. Keep the extracted folder in place; Discord loads the bundled build from there. Node.js and pnpm are not required. To uninstall, run `install.cmd --uninstall` on Windows or `sh ./install.sh --uninstall` on Linux before deleting the folder.
+
+#### Building the installer archives
+
+Install these prerequisites on the machine used to build the installers:
+
+- Git.
+- Node.js 24, matching the release workflow.
+- The pnpm version specified by `packageManager` in `package.json` (currently `pnpm@11.9.0`). If Corepack is available, run `corepack enable pnpm` to use the project's pinned version.
+- `tar` available on `PATH`, with gzip support, to create the Linux archive.
+- Internet access to install dependencies and download the official Windows and Linux installer CLI binaries from GitHub.
+
+From the root of this Git checkout, run:
+
+```sh
+# Install the project's dependencies
+pnpm install --frozen-lockfile
+
+# Compile the desktop build for both platforms
+pnpm buildStandalone
+
+# Bundle that build with the Windows and Linux installer CLIs
+pnpm buildInstallers
+```
+
+One packaging run creates both files:
+
+| Platform | Output file | Launcher after extraction |
+| --- | --- | --- |
+| Windows (x86-64) | `dist/VencordInstaller-windows.zip` | `install.cmd` |
+| Linux (x86-64) | `dist/VencordInstaller-linux.tar.gz` | `sh ./install.sh` |
+
+Each archive contains the compiled build, installer CLI, launcher, license, and installation instructions. Re-run both build commands after changing the source so the archives include your changes. Building the archives does not install Vencord into Discord.
+
+The build workflow runs the same packaging command on Ubuntu and attaches both archives to the `devbuild` release automatically when its release conditions are met.
+
 ### Linux
 
 #### Quick Install
