@@ -46,6 +46,8 @@ Discord loads Vencord directly from the archive's extracted `dist` folder. Keep 
 
 ## Updating
 
-Automatic updates are disabled in these installer releases. Quit Discord, extract the newest archive over the existing folder, and run its launcher again. Keep the same folder location. Back up any local changes before replacing files.
+Automatic updates are supported through Vencord's Updater settings. Enable automatic updates there, or check for updates manually. The updater downloads this fork's latest installer archive and replaces the bundled desktop build; restart Discord when prompted. Keep the extracted folder writable by your user so updates can be saved.
+
+If you previously installed a release with automatic updates disabled, install this newer release once to enable the updater. For a manual update, quit Discord, extract the newest archive over the existing folder, and run its launcher again. Keep the same folder location. Back up any local changes before replacing files.
 
 The release contains the Windows archive, Linux archive, and this README. Each archive also includes these instructions and license information.

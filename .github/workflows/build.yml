@@ -40,7 +40,7 @@ jobs:
               run: pnpm install --frozen-lockfile
 
             - name: Build
-              run: pnpm build --standalone --disable-updater
+              run: pnpm build --standalone
 
             - name: Package Windows and Linux installers
               run: pnpm buildInstallers

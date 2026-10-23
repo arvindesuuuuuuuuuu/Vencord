@@ -20,6 +20,7 @@ import { fetchBuffer, fetchJson } from "@main/utils/http";
 import { IpcEvents } from "@shared/IpcEvents";
 import { VENCORD_USER_AGENT } from "@shared/vencordUserAgent";
 import { ipcMain } from "electron";
+import { unzipSync } from "fflate";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 
@@ -30,6 +31,11 @@ import { serializeErrors, VENCORD_FILES } from "./common";
 
 const API_BASE = `https://api.github.com/repos/${gitRemote}`;
 let PendingUpdates = [] as [string, string][];
+let PendingArchive: string | undefined;
+
+function isBuildFile(name: string) {
+    return VENCORD_FILES.some(file => name === file || name === `${file}.map` || name === `${file}.LEGAL.txt`);
+}
 
 async function githubGet<T = any>(endpoint: string) {
     return fetchJson<T>(API_BASE + endpoint, {
@@ -57,32 +63,62 @@ async function calculateGitChanges() {
 }
 
 async function fetchUpdates() {
+    PendingUpdates = [];
+    PendingArchive = undefined;
     const data = await githubGet("/releases/latest");
 
     const hash = data.name.slice(data.name.lastIndexOf(" ") + 1);
     if (hash === gitHash)
         return false;
 
+    const pendingUpdates: [string, string][] = [];
     data.assets.forEach(({ name, browser_download_url }) => {
-        if (VENCORD_FILES.some(s => name.startsWith(s))) {
-            PendingUpdates.push([name, browser_download_url]);
+        if (isBuildFile(name)) {
+            pendingUpdates.push([name, browser_download_url]);
         }
     });
+
+    if (!VENCORD_FILES.every(file => pendingUpdates.some(([name]) => name === file))) {
+        // Both installers contain the same universal desktop build. Read the ZIP
+        // on either OS so Linux doesn't need an external archive utility.
+        const archive = IS_DISCORD_DESKTOP && data.assets.find(({ name }) => name === "VencordInstaller-windows.zip");
+        if (!archive)
+            throw new Error("The latest release does not contain a complete Vencord build.");
+        PendingArchive = archive.browser_download_url;
+    } else {
+        PendingUpdates = pendingUpdates;
+    }
 
     return true;
 }
 
 async function applyUpdates() {
-    const fileContents = await Promise.all(PendingUpdates.map(async ([name, url]) => {
-        const contents = await fetchBuffer(url);
-        return [join(__dirname, name), contents] as const;
-    }));
+    let fileContents: (readonly [string, Uint8Array])[];
+    if (PendingArchive) {
+        const files = unzipSync(await fetchBuffer(PendingArchive), {
+            filter: ({ name }) => name.startsWith("dist/") && isBuildFile(name.slice("dist/".length))
+        });
+        // Validate every required file before replacing any of the current build.
+        for (const file of VENCORD_FILES) {
+            if (!files[`dist/${file}`]?.length)
+                throw new Error(`The installer archive is missing dist/${file}.`);
+        }
+        fileContents = Object.entries(files).map(([name, contents]) => [join(__dirname, name.slice("dist/".length)), contents] as const);
+    } else {
+        if (!PendingUpdates.length)
+            throw new Error("No update is ready. Check for updates first.");
+        fileContents = await Promise.all(PendingUpdates.map(async ([name, url]) => {
+            const contents = await fetchBuffer(url);
+            return [join(__dirname, name), contents] as const;
+        }));
+    }
 
     await Promise.all(fileContents.map(async ([filename, contents]) =>
         writeFile(filename, contents))
     );
 
     PendingUpdates = [];
+    PendingArchive = undefined;
     return true;
 }
 
