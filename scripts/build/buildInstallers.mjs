@@ -69,7 +69,7 @@ try {
         await chmod(join(directory, launcher), 0o755);
         await writeFile(join(directory, "README.txt"), [
             "Fully close Discord before installing.",
-            `Run ${launcher} and select your Discord installation.`,
+            `Run ${launcher}, choose Install, Reinstall, or Uninstall, then select your Discord installation.`,
             "Extract the entire archive first. Keep this folder in a permanent location:",
             "Discord loads Vencord directly from its dist folder. Do not delete or move it.",
             `To uninstall, run ${launcher} --uninstall before removing this folder.`,

@@ -9,7 +9,7 @@ Fully quit Discord, including its tray icon, before installing or uninstalling.
 1. Download `VencordInstaller-windows.zip`.
 2. Extract the entire archive to a permanent folder.
 3. Open that folder and double-click `install.cmd`.
-4. Select your Discord installation and follow the prompts.
+4. Choose **Install**, **Reinstall**, or **Uninstall**, then select your Discord installation and follow the prompts.
 5. Start Discord again.
 
 To uninstall, open Command Prompt in the extracted folder and run:
@@ -28,7 +28,7 @@ cd VencordInstaller-linux
 sh ./install.sh
 ```
 
-Select your Discord installation and follow the prompts, then start Discord again. If the installer cannot write to Discord's installation directory, rerun `sudo sh ./install.sh`.
+Choose **Install**, **Reinstall**, or **Uninstall**, then select your Discord installation and follow the prompts. Start Discord again when finished. If the installer cannot write to Discord's installation directory, rerun `sudo sh ./install.sh`.
 
 Discord installed through Snap is unsupported. Use the official Discord package or Flatpak.
 
@@ -43,6 +43,10 @@ If uninstalling requires administrator privileges, use `sudo sh ./install.sh --u
 ## Keep the extracted folder
 
 Discord loads Vencord directly from the archive's extracted `dist` folder. Keep the entire extracted folder in its permanent location. Uninstall Vencord before deleting or moving it.
+
+## Reinstalling
+
+Run the launcher again and choose **Reinstall**. This reapplies the bundled build to the selected Discord installation, replacing its existing Vencord patch while keeping your settings. For a direct command, use `install.cmd --install` on Windows or `sh ./install.sh --install` on Linux. Uninstall is also available from either launcher's menu or through the commands above.
 
 ## Updating
 
