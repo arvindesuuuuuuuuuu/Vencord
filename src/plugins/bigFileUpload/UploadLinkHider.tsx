@@ -9,6 +9,16 @@ import { useEffect } from "@webpack/common";
 
 import { CORS_PROXY, normalizeCorsProxyUrl } from "./constants";
 
+function normalizeMediaUrl(value?: string): string | null {
+    if (!value) return null;
+    try {
+        const url = new URL(value);
+        return /^https?:$/.test(url.protocol) ? url.href : null;
+    } catch {
+        return null;
+    }
+}
+
 export function shouldHideUploadLink(message: Pick<Message, "content" | "embeds">, corsProxyUrl?: string): boolean {
     const content = message.content.trim();
     if (!content || !message.embeds.some(embed => embed.video || embed.image)) return false;
@@ -23,8 +33,12 @@ export function shouldHideUploadLink(message: Pick<Message, "content" | "embeds"
                 : proxy === "https://discord.nfp.is" ? url.searchParams.get("v") : null;
             if (!target || !/^https?:\/\//.test(target)) return false;
 
+            const normalizedTarget = normalizeMediaUrl(target);
+            if (!normalizedTarget) return false;
             return message.embeds.some(embed => Boolean(embed.video || embed.image) && (
-                embed.url === link || embed.video?.url === target || embed.image?.url === target
+                normalizeMediaUrl(embed.url) === url.href
+                || normalizeMediaUrl(embed.video?.url) === normalizedTarget
+                || normalizeMediaUrl(embed.image?.url) === normalizedTarget
             ));
         } catch {
             return false;

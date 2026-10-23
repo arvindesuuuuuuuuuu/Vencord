@@ -1,4 +1,4 @@
-.vc-file-upload-hidden-link {
+[id^="message-content-"].vc-file-upload-hidden-link {
     display: none;
 }
 
