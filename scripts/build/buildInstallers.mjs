@@ -35,7 +35,9 @@ for (const file of requiredFiles)
 
 const files = (await readdir(dist)).filter(file => /^(patcher|preload|renderer)\.(js|css)(\.map|\.LEGAL\.txt)?$/.test(file));
 const instructions = join(root, "scripts/installers/README.md");
-await copyFile(instructions, join(dist, "README.md"));
+const revision = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
+const releaseReadme = `<!-- vencord-release: ${revision} -->\n\n${await readFile(instructions, "utf8")}`;
+await writeFile(join(dist, "README.md"), releaseReadme);
 
 async function download(url) {
     const response = await fetch(url);
@@ -44,8 +46,11 @@ async function download(url) {
     return response;
 }
 
-// Resolve latest once so both platforms use the same installer release.
-const release = await (await download("https://api.github.com/repos/Vencord/Installer/releases/latest")).json();
+// Resolve latest once without the rate-limited API so both platforms use the same release.
+const installerRelease = await download("https://github.com/Vencord/Installer/releases/latest");
+const installerTag = new URL(installerRelease.url).pathname.split("/releases/tag/")[1];
+if (!installerTag)
+    throw new Error("Could not resolve the latest installer release tag.");
 const staging = await mkdtemp(join(tmpdir(), "vencord-installers-"));
 try {
     for (const platform of ["windows", "linux"]) {
@@ -58,10 +63,7 @@ try {
         await copyFile(instructions, join(directory, "README.md"));
 
         const binary = platform === "windows" ? "VencordInstallerCli.exe" : "VencordInstallerCli-linux";
-        const asset = release.assets.find(asset => asset.name === binary);
-        if (!asset)
-            throw new Error(`Installer release ${release.tag_name} is missing ${binary}`);
-        const response = await download(asset.browser_download_url);
+        const response = await download(`https://github.com/Vencord/Installer/releases/download/${installerTag}/${binary}`);
         await writeFile(join(directory, binary), Buffer.from(await response.arrayBuffer()), { mode: 0o755 });
 
         const launcher = platform === "windows" ? "install.cmd" : "install.sh";
@@ -79,7 +81,7 @@ try {
             "These installers target x86-64 Windows and Linux. Linux Snap is unsupported.",
             "If Linux reports permission denied, rerun the launcher using sudo.",
             "",
-            `Installer source (GPL-3.0): https://github.com/Vencord/Installer/tree/${release.tag_name}`,
+            `Installer source (GPL-3.0): https://github.com/Vencord/Installer/tree/${installerTag}`,
             `Vencord source (GPL-3.0-or-later): ${execFileSync("git", ["remote", "get-url", "origin"], { cwd: root, encoding: "utf8" }).trim()}`,
             `Vencord commit: ${execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim()}`,
             ""

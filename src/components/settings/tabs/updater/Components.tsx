@@ -4,17 +4,20 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./Updater.css";
+
 import { Card } from "@components/Card";
 import { ErrorCard } from "@components/ErrorCard";
 import { Flex } from "@components/Flex";
 import { Link } from "@components/Link";
+import { Paragraph } from "@components/Paragraph";
 import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { relaunch } from "@utils/native";
 import { changes, checkForUpdates, update, updateError } from "@utils/updater";
-import { Button, ConfirmModal,Forms, openModal, React, showToast, Toasts, useState } from "@webpack/common";
+import { Button, ConfirmModal,Forms, openModal, React, ReactDOM, useEffect, useState } from "@webpack/common";
 
-import { runWithDispatch } from "./runWithDispatch";
+import { getErrorMessage, runWithDispatch } from "./runWithDispatch";
 
 export interface CommonProps {
     repo: string;
@@ -71,20 +74,35 @@ export function Updatable(props: CommonProps) {
     const [updates, setUpdates] = useState(changes);
     const [isChecking, setIsChecking] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [checkError, setCheckError] = useState(updateError);
+    const [feedback, setFeedback] = useState("");
+
+    useEffect(() => {
+        if (!feedback || isChecking) return;
+        const timeout = setTimeout(() => setFeedback(""), 6000);
+        return () => clearTimeout(timeout);
+    }, [feedback, isChecking]);
 
     const isOutdated = (updates?.length ?? 0) > 0;
 
     return (
         <>
+            {(isChecking || feedback) && ReactDOM.createPortal(
+                <div className="vc-updater-status" role="status" aria-live="polite" aria-atomic="true">
+                    <Card variant={checkError ? "danger" : isChecking ? "info" : "success"}>
+                        <Paragraph>{isChecking ? "Checking for updates…" : feedback}</Paragraph>
+                    </Card>
+                </div>, document.body
+            )}
             {isChecking ? (
                 <Forms.FormText className={Margins.bottom8} role="status">
                     Checking for updates…
                 </Forms.FormText>
-            ) : !updates && updateError ? (
+            ) : checkError ? (
                 <>
-                    <Forms.FormText>Failed to check updates. Check the console for more info</Forms.FormText>
+                    <Forms.FormText>Failed to check for updates. Please try again.</Forms.FormText>
                     <ErrorCard style={{ padding: "1em" }}>
-                        <p>{updateError.stderr || updateError.stdout || "An unknown error occurred"}</p>
+                        <p>{getErrorMessage(checkError)}</p>
                     </ErrorCard>
                 </>
             ) : (
@@ -128,25 +146,25 @@ export function Updatable(props: CommonProps) {
                 )}
                 <Button
                     disabled={isUpdating || isChecking}
-                    onClick={runWithDispatch(setIsChecking, async () => {
-                        showToast("Checking for updates…", Toasts.Type.MESSAGE, {
-                            position: Toasts.Position.TOP
-                        });
-                        const outdated = await checkForUpdates();
+                    onClick={async () => {
+                        setIsChecking(true);
+                        setCheckError(undefined);
+                        setFeedback("");
+                        try {
+                            const outdated = await checkForUpdates();
 
-                        if (outdated) {
-                            setUpdates(changes);
-                            showToast(changes.length === 1 ? "Found 1 update!" : `Found ${changes.length} updates!`, Toasts.Type.SUCCESS, {
-                                position: Toasts.Position.TOP
-                            });
-                        } else {
+                            setUpdates(outdated ? changes : []);
+                            setFeedback(outdated
+                                ? changes.length === 1 ? "Found 1 update!" : `Found ${changes.length} updates!`
+                                : "You're up to date. No updates found!");
+                        } catch (error) {
                             setUpdates([]);
-
-                            showToast("You're up to date. No updates found!", Toasts.Type.SUCCESS, {
-                                position: Toasts.Position.TOP
-                            });
+                            setCheckError(error);
+                            setFeedback(`Could not check for updates: ${getErrorMessage(error)}`);
+                        } finally {
+                            setIsChecking(false);
                         }
-                    })}
+                    }}
                 >
                     {isChecking ? "Checking…" : "Check for Updates"}
                 </Button>

@@ -31,6 +31,7 @@ import { classes } from "@utils/misc";
 import { useAwaiter } from "@utils/react";
 import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
 import { Forms, React } from "@webpack/common";
+import repoPortrait from "file://repo-portrait.png?base64";
 
 import gitHash from "~git-hash";
 
@@ -101,20 +102,30 @@ function Updater() {
 
             <Forms.FormTitle tag="h5" className={Margins.top20}>Repo</Forms.FormTitle>
 
-            <Forms.FormText>
-                {repoPending
-                    ? repo
-                    : err
-                        ? "Failed to retrieve - check console"
-                        : (
-                            <Link href={repo}>
-                                {repo.split("/").slice(-2).join("/")}
-                            </Link>
-                        )
-                }
-                {" "}
-                (<HashLink hash={gitHash} repo={repo} disabled={repoPending} />)
-            </Forms.FormText>
+            <Flex className="vc-updater-repo" alignItems="center" gap="12px" flexWrap="wrap">
+                <Forms.FormText className="vc-updater-repo-link">
+                    {repoPending
+                        ? repo
+                        : err
+                            ? "Failed to retrieve - check console"
+                            : (
+                                <Link href={repo}>
+                                    {repo.split("/").slice(-2).join("/")}
+                                </Link>
+                            )
+                    }
+                    {" "}
+                    (<HashLink hash={gitHash} repo={repo} disabled={repoPending} />)
+                </Forms.FormText>
+                <img
+                    className="vc-updater-repo-portrait"
+                    src={`data:image/png;base64,${repoPortrait}`}
+                    alt="Repository portrait"
+                    width={112}
+                    height={64}
+                    draggable={false}
+                />
+            </Flex>
 
             <Divider className={classes(Margins.top16, Margins.bottom16)} />
 

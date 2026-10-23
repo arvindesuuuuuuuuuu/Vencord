@@ -38,6 +38,7 @@ async function Unwrap<T>(p: Promise<IpcRes<T>>) {
 }
 
 export async function checkForUpdates() {
+    updateError = undefined;
     changes = await Unwrap(VencordNative.updater.getUpdates());
 
     // we only want to check this for the git updater, not the http updater

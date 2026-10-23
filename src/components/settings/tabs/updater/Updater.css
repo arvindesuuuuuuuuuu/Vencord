@@ -1,0 +1,27 @@
+.vc-updater-status {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    z-index: 10001;
+    width: max-content;
+    max-width: min(480px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    pointer-events: none;
+    overflow-wrap: anywhere;
+}
+
+.vc-updater-status > div {
+    background-color: var(--background-surface-high, #313338);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 30%);
+}
+
+.vc-updater-repo-link {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.vc-updater-repo-portrait {
+    display: block;
+    flex-shrink: 0;
+    object-fit: contain;
+}

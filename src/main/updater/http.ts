@@ -30,8 +30,11 @@ import gitRemote from "~git-remote";
 import { serializeErrors, VENCORD_FILES } from "./common";
 
 const API_BASE = `https://api.github.com/repos/${gitRemote}`;
+const DOWNLOAD_BASE = `https://github.com/${gitRemote}/releases/latest/download/`;
 let PendingUpdates = [] as [string, string][];
 let PendingArchive: string | undefined;
+let PendingArchiveContents: Buffer | undefined;
+let PendingRelease: { hash: string; name: string; } | undefined;
 
 function isBuildFile(name: string) {
     return VENCORD_FILES.some(file => name === file || name === `${file}.map` || name === `${file}.LEGAL.txt`);
@@ -52,23 +55,54 @@ async function calculateGitChanges() {
     const isOutdated = await fetchUpdates();
     if (!isOutdated) return [];
 
-    const data = await githubGet(`/compare/${gitHash}...HEAD`);
+    try {
+        const data = await githubGet(`/compare/${gitHash}...${PendingRelease!.hash}`);
 
-    return data.commits.map((c: any) => ({
-        // github api only sends the long sha
-        hash: c.sha.slice(0, 7),
-        author: c.author?.login ?? c.commit?.author?.name ?? "Unknown Author",
-        message: c.commit.message.split("\n")[0]
-    }));
+        const commits = data.commits.map((c: any) => ({
+            // github api only sends the long sha
+            hash: c.sha.slice(0, 7),
+            author: c.author?.login ?? c.commit?.author?.name ?? "Unknown Author",
+            message: c.commit.message.split("\n")[0]
+        }));
+        if (commits.length) return commits;
+    } catch (error) {
+        console.warn("[Vencord] Could not retrieve update commit details; using release information.", error);
+    }
+
+    return [{ hash: PendingRelease!.hash, author: gitRemote.split("/")[0], message: PendingRelease!.name }];
 }
 
 async function fetchUpdates() {
     PendingUpdates = [];
     PendingArchive = undefined;
-    const data = await githubGet("/releases/latest");
+    PendingArchiveContents = undefined;
+    PendingRelease = undefined;
+    let data;
+    try {
+        if (!IS_DISCORD_DESKTOP) throw new Error("Use the standard release API for Vesktop.");
+        // Release downloads are available even when GitHub's API is rate limited.
+        const readme = (await fetchBuffer(DOWNLOAD_BASE + "README.md")).toString("utf8");
+        let hash = /<!-- vencord-release: ([\da-f]{7,40}) -->/.exec(readme)?.[1];
+        if (!hash) {
+            // Older installer releases have no metadata in their README.
+            PendingArchiveContents = await fetchBuffer(DOWNLOAD_BASE + "VencordInstaller-windows.zip");
+            const files = unzipSync(PendingArchiveContents, { filter: ({ name }) => name === "dist/patcher.js" });
+            const patcher = files["dist/patcher.js"];
+            hash = patcher && /^\/\/ Vencord ([\da-f]{7,40})\r?\n/.exec(Buffer.from(patcher).toString("utf8"))?.[1];
+            if (!hash) throw new Error("The installer archive has no build revision.");
+        }
+        data = {
+            name: `DevBuild ${hash}`,
+            assets: [{ name: "VencordInstaller-windows.zip", browser_download_url: DOWNLOAD_BASE + "VencordInstaller-windows.zip" }]
+        };
+    } catch {
+        PendingArchiveContents = undefined;
+        // Older releases and upstream builds still expose loose files via the API.
+        data = await githubGet("/releases/latest");
+    }
 
     const hash = data.name.slice(data.name.lastIndexOf(" ") + 1);
-    if (hash === gitHash)
+    if (hash.startsWith(gitHash) || gitHash.startsWith(hash))
         return false;
 
     const pendingUpdates: [string, string][] = [];
@@ -88,6 +122,7 @@ async function fetchUpdates() {
     } else {
         PendingUpdates = pendingUpdates;
     }
+    PendingRelease = { hash, name: data.name };
 
     return true;
 }
@@ -95,7 +130,7 @@ async function fetchUpdates() {
 async function applyUpdates() {
     let fileContents: (readonly [string, Uint8Array])[];
     if (PendingArchive) {
-        const files = unzipSync(await fetchBuffer(PendingArchive), {
+        const files = unzipSync(PendingArchiveContents ?? await fetchBuffer(PendingArchive), {
             filter: ({ name }) => name.startsWith("dist/") && isBuildFile(name.slice("dist/".length))
         });
         // Validate every required file before replacing any of the current build.
@@ -119,6 +154,7 @@ async function applyUpdates() {
 
     PendingUpdates = [];
     PendingArchive = undefined;
+    PendingArchiveContents = undefined;
     return true;
 }
 
