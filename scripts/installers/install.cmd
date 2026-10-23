@@ -3,16 +3,20 @@ setlocal
 rem Match pnpm inject: use the bundled build instead of downloading upstream.
 set "VENCORD_USER_DATA_DIR=%~dp0"
 set "VENCORD_DEV_INSTALL=1"
+set "INSTALLER_BIN=%~dp0bin\VencordInstallerCli.exe"
+if not exist "%INSTALLER_BIN%" goto missing_files
+for %%F in (patcher.js preload.js renderer.js renderer.css) do if not exist "%~dp0dist\%%F" goto missing_files
 set "INSTALLER_EXIT_CODE=0"
 if "%~1"=="" goto menu
-"%~dp0VencordInstallerCli.exe" %*
+"%INSTALLER_BIN%" %*
 set "INSTALLER_EXIT_CODE=%ERRORLEVEL%"
 pause
 exit /b %INSTALLER_EXIT_CODE%
 
 :menu
 echo.
-echo Vencord Installer
+echo Vencord Fork Installer
+echo Using bundled build: "%~dp0dist"
 echo 1) Install
 echo 2) Reinstall
 echo 3) Uninstall
@@ -75,7 +79,7 @@ if errorlevel 3 goto exit
 if errorlevel 2 goto branch
 call :close_discord
 if errorlevel 1 goto close_failed
-"%~dp0VencordInstallerCli.exe" %ACTION% --branch %BRANCH%
+"%INSTALLER_BIN%" %ACTION% --branch %BRANCH%
 set "INSTALLER_EXIT_CODE=%ERRORLEVEL%"
 if not "%INSTALLER_EXIT_CODE%"=="0" goto install_failed
 echo %OPERATION% completed.
@@ -124,6 +128,12 @@ exit /b 0
 :start_missing
 echo Installation succeeded. Start %DISCORD_FOLDER% from the Start menu.
 exit /b 0
+
+:missing_files
+echo The installer archive is incomplete. Extract all files, including bin and dist, before running install.cmd.
+echo Do not run the helper EXE directly; it installs the upstream build.
+pause
+exit /b 1
 
 :exit
 exit /b %INSTALLER_EXIT_CODE%

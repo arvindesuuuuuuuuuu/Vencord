@@ -12,6 +12,10 @@ The interactive launcher closes the selected Discord branch before applying chan
 4. Choose **Install**, **Reinstall**, or **Uninstall**, then choose **Stable**, **PTB**, or **Canary**.
 5. Choose **Continue** to apply the change. Discord starts automatically after a successful install or reinstall.
 
+Always launch **`install.cmd`** to install this fork. The EXE in `bin` is an internal helper; running it directly installs upstream Vencord and can replace your fork with the original repository's build.
+
+If you previously ran the EXE directly, fully quit Discord, then run `install.cmd` and choose **Reinstall** for the same Discord branch. This replaces the upstream patch with the bundled fork build.
+
 Choose **Back** to return to the previous screen or **Exit** to leave the installer. After an operation, choose **Back to main menu** to perform another action.
 
 To uninstall, open Command Prompt in the extracted folder and run:

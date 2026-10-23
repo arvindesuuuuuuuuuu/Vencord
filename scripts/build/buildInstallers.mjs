@@ -64,13 +64,18 @@ try {
 
         const binary = platform === "windows" ? "VencordInstallerCli.exe" : "VencordInstallerCli-linux";
         const response = await download(`https://github.com/Vencord/Installer/releases/download/${installerTag}/${binary}`);
-        await writeFile(join(directory, binary), Buffer.from(await response.arrayBuffer()), { mode: 0o755 });
+        // The Windows helper downloads upstream builds when launched directly.
+        // Keep install.cmd as the entry point that selects this fork's bundled build.
+        const binaryDirectory = platform === "windows" ? join(directory, "bin") : directory;
+        await mkdir(binaryDirectory, { recursive: true });
+        await writeFile(join(binaryDirectory, binary), Buffer.from(await response.arrayBuffer()), { mode: 0o755 });
 
         const launcher = platform === "windows" ? "install.cmd" : "install.sh";
         await copyFile(join(root, "scripts/installers", launcher), join(directory, launcher));
         await chmod(join(directory, launcher), 0o755);
         await writeFile(join(directory, "README.txt"), [
             `Run ${launcher}, choose Install, Reinstall, or Uninstall, then select Stable, PTB, or Canary.`,
+            ...(platform === "windows" ? ["Windows: always run install.cmd. Do not launch bin/VencordInstallerCli.exe directly; it installs upstream Vencord instead of this fork."] : []),
             "Use Back to return or Exit to leave. Continue closes the selected Discord branch before applying changes.",
             "After a successful install or reinstall, Discord starts automatically (except when running as root).",
             "For direct CLI commands, fully close Discord yourself and restart it afterward.",
