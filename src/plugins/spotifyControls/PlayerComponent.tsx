@@ -27,7 +27,7 @@ import { classNameFactory } from "@utils/css";
 import { copyWithToast, openImageModal } from "@utils/discord";
 import { classes } from "@utils/misc";
 import { formatDuration } from "@utils/text";
-import { ContextMenuApi, FluxDispatcher, Menu, React, showToast, Toasts, Tooltip, useCallback, useEffect, useRef, useState, useStateFromStores } from "@webpack/common";
+import { ContextMenuApi, FluxDispatcher, Menu, React, showToast, Tooltip, useCallback, useEffect, useRef, useState, useStateFromStores } from "@webpack/common";
 
 import { settings } from ".";
 import { SeekBar } from "./SeekBar";
@@ -246,7 +246,7 @@ function VolumeBar({
         >
             <Button
                 className={classes(cl("button"), cl("volume-button"), cl("volume"))}
-                onClick={disabled ? () => disabledReason && showToast(disabledReason, Toasts.Type.FAILURE) : onMuteToggle}
+                onClick={disabled ? () => disabledReason && showToast({ text: disabledReason, variant: "critical" }) : onMuteToggle}
                 disabled={disabled}
                 aria-label={disabled ? (disabledReason ?? "Volume control unavailable") : volume === 0 ? "Unmute" : "Mute"}
                 title={disabled ? (disabledReason ?? "Volume control unavailable") : volume === 0 ? "Unmute" : "Mute"}
@@ -469,7 +469,7 @@ export function Player() {
 
     const changeVolume = useCallback((newVol: number, immediate = false) => {
         if (!supportsVolume) {
-            if (disabledReason) showToast(disabledReason, Toasts.Type.FAILURE);
+            if (disabledReason) showToast({ text: disabledReason, variant: "critical" });
             return;
         }
         const clamped = Math.min(100, Math.max(0, Math.round(newVol)));
@@ -487,7 +487,7 @@ export function Player() {
 
     const onMuteToggle = useCallback(() => {
         if (!supportsVolume) {
-            if (disabledReason) showToast(disabledReason, Toasts.Type.FAILURE);
+            if (disabledReason) showToast({ text: disabledReason, variant: "critical" });
             return;
         }
         if (volumeRef.current > 0) {

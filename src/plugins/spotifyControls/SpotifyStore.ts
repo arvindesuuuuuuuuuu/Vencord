@@ -19,7 +19,7 @@
 import { isPluginEnabled } from "@api/PluginManager";
 import OpenInAppPlugin from "@plugins/openInApp";
 import { findByProps, findByPropsLazy, proxyLazyWebpack } from "@webpack";
-import { Flux, FluxDispatcher, showToast, Toasts } from "@webpack/common";
+import { Flux, FluxDispatcher, showToast } from "@webpack/common";
 
 import { settings } from ".";
 
@@ -128,7 +128,7 @@ export const SpotifyStore = proxyLazyWebpack(() => {
 
         setVolume(percent: number) {
             if (this.device?.supports_volume === false) {
-                showToast(`Volume control is not supported on ${this.device.name ?? "this device"}`, Toasts.Type.FAILURE);
+                showToast({ text: `Volume control is not supported on ${this.device.name ?? "this device"}`, variant: "critical" });
                 return Promise.resolve();
             }
 
@@ -146,11 +146,11 @@ export const SpotifyStore = proxyLazyWebpack(() => {
                 const status = err?.status;
                 const message = err?.body?.error?.message;
                 if (status === 403) {
-                    showToast(`Volume control is not supported on ${this.device?.name ?? "this device"}`, Toasts.Type.FAILURE);
+                    showToast({ text: `Volume control is not supported on ${this.device?.name ?? "this device"}`, variant: "critical" });
                 } else if (status === 404) {
-                    showToast("No active Spotify playback device found", Toasts.Type.FAILURE);
+                    showToast({ text: "No active Spotify playback device found", variant: "critical" });
                 } else if (message) {
-                    showToast(`Spotify: ${message}`, Toasts.Type.FAILURE);
+                    showToast({ text: `Spotify: ${message}`, variant: "critical" });
                 }
                 this.volume = prev;
                 this.emitChange();

@@ -15,7 +15,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { relaunch } from "@utils/native";
 import { changes, checkForUpdates, update, updateError } from "@utils/updater";
-import { Button, ConfirmModal,Forms, openModal, React, ReactDOM, useEffect, useState } from "@webpack/common";
+import { Button, ConfirmModal, Forms, openModal, React, ReactDOM, useEffect, useState } from "@webpack/common";
 
 import { getErrorMessage, runWithDispatch } from "./runWithDispatch";
 
