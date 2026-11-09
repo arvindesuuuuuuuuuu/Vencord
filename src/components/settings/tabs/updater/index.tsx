@@ -32,6 +32,7 @@ import { useAwaiter } from "@utils/react";
 import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
 import { React } from "@webpack/common";
 import repoPortrait from "file://repo-portrait.png?base64";
+import repoPortrait2 from "file://repo-portrait-2.png?base64";
 
 import gitHash from "~git-hash";
 
@@ -117,14 +118,22 @@ function Updater() {
                     {" "}
                     (<HashLink hash={gitHash} repo={repo} disabled={repoPending} />)
                 </Paragraph>
-                <img
-                    className="vc-updater-repo-portrait"
-                    src={`data:image/png;base64,${repoPortrait}`}
-                    alt="Repository portrait"
-                    width={112}
-                    height={64}
-                    draggable={false}
-                />
+                <div className="vc-updater-repo-duo">
+                    <img
+                        className="vc-updater-repo-portrait"
+                        src={`data:image/png;base64,${repoPortrait}`}
+                        alt="Repository portrait"
+                        height={64}
+                        draggable={false}
+                    />
+                    <img
+                        className="vc-updater-repo-portrait"
+                        src={`data:image/png;base64,${repoPortrait2}`}
+                        alt="Repository portrait 2"
+                        height={64}
+                        draggable={false}
+                    />
+                </div>
             </Flex>
 
 

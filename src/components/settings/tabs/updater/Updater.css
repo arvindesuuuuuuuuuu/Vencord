@@ -20,13 +20,23 @@
     overflow-wrap: anywhere;
 }
 
-.vc-updater-repo-portrait {
-    display: block;
-    flex-shrink: 0;
-    object-fit: contain;
+.vc-updater-repo-duo {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 8px;
     transform-origin: center bottom;
     will-change: transform;
     animation: vc-updater-portrait-walk 7s linear infinite;
+    user-select: none;
+    pointer-events: auto;
+}
+
+.vc-updater-repo-portrait {
+    display: block;
+    height: 64px;
+    width: auto;
+    flex-shrink: 0;
+    object-fit: contain;
 }
 
 @keyframes vc-updater-portrait-walk {
@@ -160,7 +170,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .vc-updater-repo-portrait {
+    .vc-updater-repo-duo {
         animation: none;
     }
 }
