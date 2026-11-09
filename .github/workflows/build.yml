@@ -21,6 +21,7 @@ permissions:
 env:
     FORCE_COLOR: true
     plugins_changed: false
+    VENCORD_REMOTE: ${{ github.repository }}
 
 jobs:
     Build:
