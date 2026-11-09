@@ -369,7 +369,7 @@ export default definePlugin({
     name: "BigFileUpload",
     description: "Bypass Discord's upload limit by uploading to external file uploaders.",
     tags: ["Media"],
-    authors: [Devs.ScattrdBlade, Devs.creations, { name: "Key", id: 1230319937155760131n }],
+    authors: [Devs.ScattrdBlade, Devs.creations, Devs.Key],
     enabledByDefault: true,
     settings,
     renderMessageAccessory({ message }) {
