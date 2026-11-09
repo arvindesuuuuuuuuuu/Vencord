@@ -5,8 +5,8 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { Paragraph } from "@components/Paragraph";
 import { OptionType } from "@utils/types";
-import { Forms } from "@webpack/common";
 
 import { requestQuestRefresh } from "./hooks";
 
@@ -21,10 +21,10 @@ function AchievementCaution() {
             marginTop: 8,
             marginBottom: 4,
         }}>
-            <Forms.FormText style={{ color: "var(--status-danger, #f23f42)", fontWeight: "bold", marginBottom: 6 }}>
+            <Paragraph style={{ color: "var(--status-danger, #f23f42)", fontWeight: "bold", marginBottom: 6 }}>
                 ⚠️ CAUTION:
-            </Forms.FormText>
-            <Forms.FormText style={{ color: "var(--text-normal)" }}>
+            </Paragraph>
+            <Paragraph style={{ color: "var(--text-normal)" }}>
                 This works by OAuth-authorizing the quest's app on your account, reporting progress
                 to the activity backend, then revoking the grant afterward.
                 This automates actions on your logged-in account and may put your account at risk
@@ -38,7 +38,7 @@ function AchievementCaution() {
                     Discord's Terms of Service
                 </a>
                 . Off by default — enabling it is your explicit consent.
-            </Forms.FormText>
+            </Paragraph>
         </div>
     );
 }

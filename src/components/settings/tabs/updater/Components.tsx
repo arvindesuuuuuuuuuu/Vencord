@@ -16,7 +16,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { promptToRestart } from "@utils/promptToRestart";
 import { changes, checkForUpdates, update, updateError } from "@utils/updater";
-import { ConfirmModal, Forms, openModal, React, ReactDOM, showToast, useEffect, useState } from "@webpack/common";
+import { ConfirmModal, openModal, React, ReactDOM, showToast, useEffect, useState } from "@webpack/common";
 
 import { getErrorMessage, runWithDispatch } from "./runWithDispatch";
 
@@ -96,9 +96,9 @@ export function Updatable(props: CommonProps) {
                 </div>, document.body
             )}
             {isChecking ? (
-                <Forms.FormText className={Margins.bottom8} role="status">
+                <Paragraph className={Margins.bottom8} role="status">
                     Checking for updates…
-                </Forms.FormText>
+                </Paragraph>
             ) : checkError ? (
                 <>
                     <Paragraph>Failed to check updates. Check the console for more info</Paragraph>

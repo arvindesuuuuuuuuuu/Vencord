@@ -30,7 +30,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { useAwaiter } from "@utils/react";
 import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
-import { Forms, React } from "@webpack/common";
+import { React } from "@webpack/common";
 import repoPortrait from "file://repo-portrait.png?base64";
 
 
@@ -104,7 +104,7 @@ function Updater() {
             <Heading className={classes(Margins.top20, Margins.bottom8)}>Repo</Heading>
 
             <Flex className="vc-updater-repo" alignItems="center" gap="12px" flexWrap="wrap">
-                <Forms.FormText className="vc-updater-repo-link">
+                <Paragraph className="vc-updater-repo-link">
                     {repoPending
                         ? repo
                         : err
@@ -117,7 +117,7 @@ function Updater() {
                     }
                     {" "}
                     (<HashLink hash={gitHash} repo={repo} disabled={repoPending} />)
-                </Forms.FormText>
+                </Paragraph>
                 <img
                     className="vc-updater-repo-portrait"
                     src={`data:image/png;base64,${repoPortrait}`}
