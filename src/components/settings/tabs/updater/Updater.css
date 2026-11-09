@@ -24,4 +24,128 @@
     display: block;
     flex-shrink: 0;
     object-fit: contain;
+    transform-origin: center bottom;
+    will-change: transform;
+    animation: vc-updater-portrait-walk 7s linear infinite;
 }
+
+@keyframes vc-updater-portrait-walk {
+    0% {
+        transform: translate3d(0, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    4% {
+        transform: translate3d(28px, -5px, 0) scaleX(1) rotate(4deg);
+    }
+
+    8% {
+        transform: translate3d(56px, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    12% {
+        transform: translate3d(85px, -5px, 0) scaleX(1) rotate(-4deg);
+    }
+
+    16% {
+        transform: translate3d(114px, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    20% {
+        transform: translate3d(142px, -5px, 0) scaleX(1) rotate(4deg);
+    }
+
+    24% {
+        transform: translate3d(171px, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    28% {
+        transform: translate3d(200px, -5px, 0) scaleX(1) rotate(-4deg);
+    }
+
+    32% {
+        transform: translate3d(228px, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    36% {
+        transform: translate3d(250px, -3px, 0) scaleX(1) rotate(2deg);
+    }
+
+    38% {
+        transform: translate3d(260px, 0, 0) scaleX(1) rotate(0deg);
+    }
+
+    40% {
+        transform: translate3d(260px, -6px, 0) scaleX(1) rotate(90deg);
+    }
+
+    43% {
+        transform: translate3d(260px, -14px, 0) scaleX(1) rotate(180deg);
+    }
+
+    46% {
+        transform: translate3d(260px, -6px, 0) scaleX(1) rotate(270deg);
+    }
+
+    49% {
+        transform: translate3d(260px, 0, 0) scaleX(1) rotate(360deg);
+    }
+
+    51% {
+        transform: translate3d(260px, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    55% {
+        transform: translate3d(232px, -5px, 0) scaleX(-1) rotate(4deg);
+    }
+
+    59% {
+        transform: translate3d(204px, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    63% {
+        transform: translate3d(175px, -5px, 0) scaleX(-1) rotate(-4deg);
+    }
+
+    67% {
+        transform: translate3d(146px, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    71% {
+        transform: translate3d(118px, -5px, 0) scaleX(-1) rotate(4deg);
+    }
+
+    75% {
+        transform: translate3d(89px, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    79% {
+        transform: translate3d(60px, -5px, 0) scaleX(-1) rotate(-4deg);
+    }
+
+    83% {
+        transform: translate3d(32px, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    86% {
+        transform: translate3d(10px, -3px, 0) scaleX(-1) rotate(2deg);
+    }
+
+    88% {
+        transform: translate3d(0, 0, 0) scaleX(-1) rotate(0deg);
+    }
+
+    94% {
+        transform: translate3d(0, -3px, 0) scaleX(1) rotate(0deg);
+    }
+
+    100% {
+        transform: translate3d(0, 0, 0) scaleX(1) rotate(0deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vc-updater-repo-portrait {
+        animation: none;
+    }
+}
+
