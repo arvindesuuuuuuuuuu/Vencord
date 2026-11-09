@@ -57,6 +57,7 @@ async function calculateGitChanges() {
 
     try {
         const data = await githubGet(`/compare/${gitHash}...${PendingRelease!.hash}`);
+        if (data.status === "behind" || data.status === "identical") return [];
 
         const commits = data.commits.map((c: any) => ({
             // github api only sends the long sha
