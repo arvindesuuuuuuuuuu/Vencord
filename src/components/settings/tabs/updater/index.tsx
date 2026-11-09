@@ -103,7 +103,7 @@ function Updater() {
 
             <Heading className={classes(Margins.top20, Margins.bottom8)}>Repo</Heading>
 
-            <Flex className="vc-updater-repo" alignItems="center" gap="12px" flexWrap="wrap">
+            <Flex className="vc-updater-repo" alignItems="center" gap="12px" flexWrap="nowrap">
                 <Paragraph className="vc-updater-repo-link">
                     {repoPending
                         ? repo
@@ -119,20 +119,24 @@ function Updater() {
                     (<HashLink hash={gitHash} repo={repo} disabled={repoPending} />)
                 </Paragraph>
                 <div className="vc-updater-repo-duo">
-                    <img
-                        className="vc-updater-repo-portrait vc-updater-portrait-1"
-                        src={`data:image/png;base64,${repoPortrait}`}
-                        alt="Repository portrait"
-                        height={64}
-                        draggable={false}
-                    />
-                    <img
-                        className="vc-updater-repo-portrait vc-updater-portrait-2"
-                        src={`data:image/png;base64,${repoPortrait2}`}
-                        alt="Repository portrait 2"
-                        height={64}
-                        draggable={false}
-                    />
+                    <div className="vc-updater-walker vc-updater-walker-1">
+                        <img
+                            className="vc-updater-repo-portrait vc-updater-portrait-1"
+                            src={`data:image/png;base64,${repoPortrait}`}
+                            alt="Repository portrait"
+                            height={64}
+                            draggable={false}
+                        />
+                    </div>
+                    <div className="vc-updater-walker vc-updater-walker-2">
+                        <img
+                            className="vc-updater-repo-portrait vc-updater-portrait-2"
+                            src={`data:image/png;base64,${repoPortrait2}`}
+                            alt="Repository portrait 2"
+                            height={64}
+                            draggable={false}
+                        />
+                    </div>
                 </div>
             </Flex>
 
