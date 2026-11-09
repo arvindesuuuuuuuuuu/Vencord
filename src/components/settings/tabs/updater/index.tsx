@@ -120,14 +120,14 @@ function Updater() {
                 </Paragraph>
                 <div className="vc-updater-repo-duo">
                     <img
-                        className="vc-updater-repo-portrait"
+                        className="vc-updater-repo-portrait vc-updater-portrait-1"
                         src={`data:image/png;base64,${repoPortrait}`}
                         alt="Repository portrait"
                         height={64}
                         draggable={false}
                     />
                     <img
-                        className="vc-updater-repo-portrait"
+                        className="vc-updater-repo-portrait vc-updater-portrait-2"
                         src={`data:image/png;base64,${repoPortrait2}`}
                         alt="Repository portrait 2"
                         height={64}
