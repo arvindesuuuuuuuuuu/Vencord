@@ -22,7 +22,7 @@ import { Card } from "@components/Card";
 import { Divider } from "@components/Divider";
 import { Flex } from "@components/Flex";
 import { FormSwitch } from "@components/FormSwitch";
-import { HeadingSecondary } from "@components/Heading";
+import { Heading } from "@components/Heading";
 import { Link } from "@components/Link";
 import { Paragraph } from "@components/Paragraph";
 import { SettingsTab, wrapTab } from "@components/settings/tabs/BaseTab";
@@ -32,6 +32,7 @@ import { useAwaiter } from "@utils/react";
 import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
 import { Forms, React } from "@webpack/common";
 import repoPortrait from "file://repo-portrait.png?base64";
+
 
 import gitHash from "~git-hash";
 
@@ -45,7 +46,7 @@ function VesktopSection() {
     return (
         <Flex className={Margins.bottom20} flexDirection="column" gap="1em">
             <Card variant="info">
-                <HeadingSecondary>Vesktop & Vencord</HeadingSecondary>
+                <Heading className={Margins.bottom8}>Vesktop & Vencord</Heading>
                 <Paragraph>Vesktop and Vencord are two separate things. This updater is for Vencord.</Paragraph>
                 <Paragraph className={Margins.top8}>
                     You receive separate popups for Vesktop updates. You can also manually update by installing the <Link href="https://vesktop.dev/install">latest version</Link>.
@@ -54,7 +55,7 @@ function VesktopSection() {
 
             {isVesktopOutdated && (
                 <Card variant="warning">
-                    <HeadingSecondary>Vesktop Outdated</HeadingSecondary>
+                    <Heading className={Margins.bottom8}>Vesktop Outdated</Heading>
                     <Flex flexDirection="column" gap="0.5em">
                         <Paragraph>Your version of Vesktop is outdated!</Paragraph>
                         <Button variant="link" onClick={() => VesktopNative.app.openUpdater()}>Open Vesktop Updater</Button>
@@ -100,7 +101,7 @@ function Updater() {
                 />
             </div>
 
-            <Forms.FormTitle tag="h5" className={Margins.top20}>Repo</Forms.FormTitle>
+            <Heading className={classes(Margins.top20, Margins.bottom8)}>Repo</Heading>
 
             <Flex className="vc-updater-repo" alignItems="center" gap="12px" flexWrap="wrap">
                 <Forms.FormText className="vc-updater-repo-link">
@@ -127,9 +128,10 @@ function Updater() {
                 />
             </Flex>
 
+
             <Divider className={classes(Margins.top16, Margins.bottom16)} />
 
-            <Forms.FormTitle tag="h5">Updates</Forms.FormTitle>
+            <Heading className={Margins.bottom8}>Updates</Heading>
 
             {isNewer
                 ? <Newer {...commonProps} />
