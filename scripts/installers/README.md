@@ -9,16 +9,15 @@ The interactive launcher closes the selected Discord branch before applying chan
 1. Download `VencordInstaller-windows.zip`.
 2. Extract the entire archive to a permanent folder.
 3. Open that folder and double-click `install.cmd`.
-4. Choose **Install**, **Reinstall**, or **Uninstall**, then choose **Stable**, **PTB**, or **Canary**.
-5. Choose **Continue** to apply the change. Discord starts automatically after a successful install or reinstall.
+4. The **Vencord Graphical Installer** window opens with a dark Discord theme.
+5. Select your Discord branch (**Discord Stable**, **PTB**, **Canary**, or specify a custom folder).
+6. Click **Install**, **Reinstall / Repair**, or **Uninstall**.
+7. If "Automatically close and restart Discord" is checked, the installer gracefully stops Discord, applies the patch, and restarts Discord automatically.
 
-Always launch **`install.cmd`** to install this fork. The EXE in `bin` is an internal helper; running it directly installs upstream Vencord and can replace your fork with the original repository's build.
+*Note:* If you prefer the terminal interface or run in a headless environment, launch `install.cmd --cli`.
+Always launch **`install.cmd`** to install this fork. Do not run the EXE in `bin` directly; it installs upstream Vencord.
 
-If you previously ran the EXE directly, fully quit Discord, then run `install.cmd` and choose **Reinstall** for the same Discord branch. This replaces the upstream patch with the bundled fork build.
-
-Choose **Back** to return to the previous screen or **Exit** to leave the installer. After an operation, choose **Back to main menu** to perform another action.
-
-To uninstall, open Command Prompt in the extracted folder and run:
+To uninstall via command line, run:
 
 ```bat
 install.cmd --uninstall
@@ -31,21 +30,23 @@ Download `VencordInstaller-linux.tar.gz`, then extract it and run the installer:
 ```sh
 tar -xzf VencordInstaller-linux.tar.gz
 cd VencordInstaller-linux
-sh ./install.sh
+./install.sh
 ```
 
-Choose **Install**, **Reinstall**, or **Uninstall**, then choose **Stable**, **PTB**, or **Canary** and **Continue**. Use **Back** to return to the previous screen or **Exit** to leave. After an operation, you can return to the main menu.
+When run in a desktop environment (GNOME, KDE, XFCE, Sway, Hyprland, etc.), a native graphical wizard (`zenity`) appears guiding you through:
+- Choosing **Install**, **Reinstall / Repair**, or **Uninstall**
+- Selecting **Discord Stable**, **PTB**, **Canary**, or a custom installation directory
+- Reviewing confirmation and monitoring live progress
+- Discord is automatically closed before patching and restarted after a successful install or reinstall
 
-The launcher closes the selected branch before patching and starts it after a successful install or reinstall. This requires `pgrep` and `pkill` (usually provided by `procps` or `procps-ng`). If Discord does not exit within 10 seconds, the operation stops so you can quit it from the tray and try again.
+If run inside a terminal without a graphical desktop (or if you run `./install.sh --cli`), an interactive terminal UI (`whiptail` or ANSI-colored menu) is displayed.
 
-If the installer cannot write to Discord's installation directory, rerun `sudo sh ./install.sh`. When running as root, it leaves Discord closed; start it yourself as your normal user. Automatic launch supports the `discord`, `discord-ptb`, and `discord-canary` commands and their Flatpak installations. If no launcher is found, start Discord from your application menu.
+If the installer cannot write to Discord's installation directory, rerun `sudo ./install.sh`. When running as root, it leaves Discord closed; start it yourself as your normal user. Automatic launch supports `discord`, `discord-ptb`, and `discord-canary` commands and Flatpak installations. Snap is unsupported.
 
-Discord installed through Snap is unsupported. Use the official Discord package or Flatpak.
-
-To uninstall, run this from the extracted folder:
+To uninstall via command line:
 
 ```sh
-sh ./install.sh --uninstall
+./install.sh --uninstall
 ```
 
 If uninstalling requires administrator privileges, use `sudo sh ./install.sh --uninstall`.

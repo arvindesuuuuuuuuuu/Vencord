@@ -73,10 +73,13 @@ try {
         const launcher = platform === "windows" ? "install.cmd" : "install.sh";
         await copyFile(join(root, "scripts/installers", launcher), join(directory, launcher));
         await chmod(join(directory, launcher), 0o755);
+        if (platform === "windows") {
+            await copyFile(join(root, "scripts/installers/gui.ps1"), join(binaryDirectory, "gui.ps1"));
+        }
         await writeFile(join(directory, "README.txt"), [
-            `Run ${launcher}, choose Install, Reinstall, or Uninstall, then select Stable, PTB, or Canary.`,
+            `Run ${launcher} to launch the graphical installer (or run with --cli for console mode).`,
             ...(platform === "windows" ? ["Windows: always run install.cmd. Do not launch bin/VencordInstallerCli.exe directly; it installs upstream Vencord instead of this fork."] : []),
-            "Use Back to return or Exit to leave. Continue closes the selected Discord branch before applying changes.",
+            "Choose Install, Reinstall, or Uninstall, then select your Discord version.",
             "After a successful install or reinstall, Discord starts automatically (except when running as root).",
             "For direct CLI commands, fully close Discord yourself and restart it afterward.",
             "Extract the entire archive first. Keep this folder in a permanent location:",

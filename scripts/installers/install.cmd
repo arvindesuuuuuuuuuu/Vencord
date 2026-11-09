@@ -4,14 +4,29 @@ rem Match pnpm inject: use the bundled build instead of downloading upstream.
 set "VENCORD_USER_DATA_DIR=%~dp0"
 set "VENCORD_DEV_INSTALL=1"
 set "INSTALLER_BIN=%~dp0bin\VencordInstallerCli.exe"
+if not exist "%INSTALLER_BIN%" set "INSTALLER_BIN=%~dp0VencordInstallerCli.exe"
 if not exist "%INSTALLER_BIN%" goto missing_files
 for %%F in (patcher.js preload.js renderer.js renderer.css) do if not exist "%~dp0dist\%%F" goto missing_files
 set "INSTALLER_EXIT_CODE=0"
-if "%~1"=="" goto menu
-"%INSTALLER_BIN%" %*
-set "INSTALLER_EXIT_CODE=%ERRORLEVEL%"
-pause
-exit /b %INSTALLER_EXIT_CODE%
+
+if "%~1"=="--cli" goto menu
+if not "%~1"=="" (
+    "%INSTALLER_BIN%" %*
+    set "INSTALLER_EXIT_CODE=%ERRORLEVEL%"
+    pause
+    exit /b %INSTALLER_EXIT_CODE%
+)
+
+rem Attempt to launch graphical installer
+set "GUI_SCRIPT=%~dp0bin\gui.ps1"
+if not exist "%GUI_SCRIPT%" set "GUI_SCRIPT=%~dp0gui.ps1"
+if exist "%GUI_SCRIPT%" (
+    where powershell >nul 2>&1
+    if not errorlevel 1 (
+        powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%GUI_SCRIPT%"
+        if not errorlevel 1 exit /b 0
+    )
+)
 
 :menu
 echo.

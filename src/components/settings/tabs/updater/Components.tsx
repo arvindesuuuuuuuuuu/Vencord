@@ -16,7 +16,7 @@ import { Margins } from "@utils/margins";
 import { classes } from "@utils/misc";
 import { promptToRestart } from "@utils/promptToRestart";
 import { changes, checkForUpdates, update, updateError } from "@utils/updater";
-import { ConfirmModal, openModal, React, ReactDOM, showToast, useEffect, useState } from "@webpack/common";
+import { React, ReactDOM, useEffect, useState } from "@webpack/common";
 
 import { getErrorMessage, runWithDispatch } from "./runWithDispatch";
 

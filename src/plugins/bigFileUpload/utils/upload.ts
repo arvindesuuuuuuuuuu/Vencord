@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { normalizeCorsProxyUrl, toProxiedUrl } from "@plugins/bigFileUpload/constants";
+import { settings } from "@plugins/bigFileUpload/settings";
+import { fallbackServiceOrder, serviceLabels, ServiceType, ShareXUploaderConfig, UploadResponse } from "@plugins/bigFileUpload/types";
 import { copyToClipboard } from "@utils/clipboard";
 import { insertTextIntoChatInputBox } from "@utils/discord";
 import { Logger } from "@utils/Logger";
@@ -11,9 +14,6 @@ import { PluginNative } from "@utils/types";
 import { chooseFile } from "@utils/web";
 import { showToast } from "@webpack/common";
 
-import { normalizeCorsProxyUrl, toProxiedUrl } from "../constants";
-import { settings } from "../settings";
-import { fallbackServiceOrder, serviceLabels, ServiceType, ShareXUploaderConfig, UploadResponse } from "../types";
 import { convertApngToGif } from "./apngToGif";
 import { formatUploadLink } from "./formatUploadLink";
 import { getExtensionFromBytes, getExtensionFromMime, getMimeFromExtension, getUrlExtension } from "./getMediaUrl";

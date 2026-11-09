@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { toProxiedUrl } from "@plugins/bigFileUpload/constants";
+import { settings } from "@plugins/bigFileUpload/settings";
 import { PluginNative } from "@utils/types";
-
-import { toProxiedUrl } from "../constants";
-import { settings } from "../settings";
 
 type S3Store = {
     s3Endpoint?: string;

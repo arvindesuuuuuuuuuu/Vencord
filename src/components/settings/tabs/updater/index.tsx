@@ -33,7 +33,6 @@ import { getRepo, isNewer, UpdateLogger } from "@utils/updater";
 import { React } from "@webpack/common";
 import repoPortrait from "file://repo-portrait.png?base64";
 
-
 import gitHash from "~git-hash";
 
 import { CommonProps, HashLink, Newer, Updatable } from "./Components";
