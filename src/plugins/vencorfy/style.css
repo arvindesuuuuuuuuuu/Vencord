@@ -1,0 +1,1250 @@
+/*
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+.vc-vencorfy-root {
+    --bf-bg: var(--background-surface-high, var(--background-secondary-alt, #18191c));
+    --bf-surface: var(--background-base-low, var(--background-secondary, #232428));
+    --bf-surface-h: var(--background-mod-subtle, #2b2d31);
+    --bf-border: var(--border-subtle, rgb(255 255 255 / 8%));
+    --bf-border-strong: var(--border-normal, rgb(255 255 255 / 14%));
+    --bf-text: var(--text-default, #dbdee1);
+    --bf-muted: var(--text-muted, #949ba4);
+    --bf-accent: var(--brand-500, #5865f2);
+    --bf-accent-h: var(--brand-560, #4752c4);
+    --bf-owned: var(--status-positive, #23a55a);
+    --bf-owned-bg: rgb(35 165 90 / 14%);
+    --bf-maxed: #f0b232;
+    --bf-danger: var(--status-danger, #ed4245);
+    --bf-radius: 12px;
+    --bf-radius-sm: 8px;
+
+    color-scheme: dark;
+    background: var(--bf-bg);
+    color: var(--bf-text);
+    font-family: var(--font-primary, "gg sans", "Noto Sans", sans-serif);
+    font-size: 13px;
+    line-height: 1.4;
+    border-radius: var(--bf-radius);
+    padding: 14px;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    box-sizing: border-box;
+    border: 1px solid var(--bf-border);
+}
+
+.vc-vencorfy-root *,
+.vc-vencorfy-root *::before,
+.vc-vencorfy-root *::after {
+    box-sizing: border-box;
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-track {
+    background: rgb(0 0 0 / 18%);
+    border-radius: 999px;
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thin-thumb, rgb(255 255 255 / 18%));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.15s ease;
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-auto-thumb, rgb(255 255 255 / 32%));
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-thumb:active {
+    background-color: var(--scrollbar-auto-thumb, rgb(255 255 255 / 44%));
+}
+
+.vc-vencorfy-root ::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.vc-vencorfy-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.vc-vencorfy-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-vencorfy-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+    margin: 0;
+}
+
+.vc-vencorfy-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 16px;
+    padding: 0 6px;
+    border-radius: 8px;
+    background-color: var(--brand-500, #5865f2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border: none;
+}
+
+.vc-vencorfy-tag.vc-vencorfy-tag-disabled {
+    background-color: var(--status-danger, #ed4245);
+    color: #fff;
+    border: none;
+}
+
+.vc-vencorfy-tag.vc-vencorfy-stream-live {
+    background-color: var(--status-danger, #ed4245);
+    color: #fff;
+    border: none;
+}
+
+.vc-vencorfy-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--interactive-normal, var(--bf-muted));
+    cursor: pointer;
+    padding: 5px 7px;
+    border-radius: var(--bf-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.vc-vencorfy-icon-btn:hover {
+    color: var(--interactive-hover, #fff);
+    background-color: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+}
+
+.vc-vencorfy-icon-btn:active {
+    background-color: var(--background-modifier-active, rgb(255 255 255 / 12%));
+}
+
+svg.vc-vencorfy-spinning,
+.vc-vencorfy-spinning svg {
+    animation: vc-vencorfy-spin 0.75s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes vc-vencorfy-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.vc-vencorfy-user-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--bf-surface);
+    border: 1px solid var(--bf-border);
+    border-radius: var(--bf-radius);
+    margin-bottom: 10px;
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.vc-vencorfy-user-row:hover {
+    border-color: var(--bf-border-strong);
+}
+
+.vc-vencorfy-user-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.vc-vencorfy-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.vc-vencorfy-user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.vc-vencorfy-username {
+    font-weight: 600;
+    color: #fff;
+    font-size: 13.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-vencorfy-usertag {
+    color: var(--bf-muted);
+    font-size: 11px;
+}
+
+.vc-vencorfy-warning-banner {
+    background: rgb(234 179 8 / 7%);
+    border: 1px solid rgb(234 179 8 / 24%);
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+}
+
+.vc-vencorfy-warning-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #eab308;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.vc-vencorfy-warning-body {
+    color: #d6b667;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.vc-vencorfy-warning-body strong {
+    color: #f4cf6d;
+    font-weight: 700;
+}
+
+.vc-vencorfy-sync-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgb(88 101 242 / 8%);
+    border: 1px solid rgb(88 101 242 / 22%);
+    border-radius: 10px;
+    padding: 7px 10px;
+    margin-bottom: 10px;
+    font-size: 11px;
+    color: #c9cdfb;
+    line-height: 1.35;
+}
+
+.vc-vencorfy-sync-icon {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: var(--bf-accent);
+}
+
+.vc-vencorfy-section {
+    background: var(--bf-surface);
+    border: 1px solid var(--bf-border);
+    border-radius: var(--bf-radius);
+    padding: 11px 12px 10px;
+    margin-bottom: 10px;
+    transition: border-color 0.15s ease;
+}
+
+.vc-vencorfy-section:hover {
+    border-color: var(--bf-border-strong);
+}
+
+.vc-vencorfy-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 9px;
+}
+
+.vc-vencorfy-section-num {
+    width: 18px;
+    height: 18px;
+    border-radius: 6px;
+    background: var(--bf-accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.vc-vencorfy-section-title {
+    font-weight: 700;
+    color: #fff;
+    font-size: 13px;
+    flex: 1;
+}
+
+.vc-vencorfy-section-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2.5px 8px;
+    border-radius: 20px;
+    background: var(--bf-surface-h);
+    color: var(--bf-muted);
+    border: 1px solid var(--bf-border);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.vc-vencorfy-section-status.owned {
+    background: var(--bf-owned-bg);
+    color: var(--bf-owned);
+    border-color: rgb(35 165 90 / 28%);
+}
+
+.vc-vencorfy-section-status.maxed {
+    background: rgb(240 178 50 / 12%);
+    color: var(--bf-maxed);
+    border-color: rgb(240 178 50 / 28%);
+}
+
+.vc-vencorfy-game-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 9px;
+    position: relative;
+}
+
+.vc-vencorfy-game-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-vencorfy-game-input {
+    flex: 1;
+    background: var(--bf-bg);
+    border: 1px solid var(--bf-border);
+    border-radius: var(--bf-radius-sm);
+    color: var(--bf-text);
+    padding: 6px 10px;
+    font-size: 11.5px;
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.vc-vencorfy-game-input:hover {
+    border-color: var(--bf-border-strong);
+}
+
+.vc-vencorfy-game-input:focus {
+    border-color: var(--bf-accent);
+}
+
+.vc-vencorfy-game-clear {
+    background: var(--bf-surface-h);
+    border: 1px solid var(--bf-border);
+    color: var(--bf-muted);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition:
+        color 0.15s ease,
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.vc-vencorfy-game-clear:hover {
+    color: #fff;
+    background: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+    border-color: var(--bf-border-strong);
+}
+
+.vc-vencorfy-game-dropdown {
+    background: var(--bf-bg);
+    border: 1px solid var(--bf-border-strong);
+    border-radius: var(--bf-radius-sm);
+    max-height: 150px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 4px;
+    gap: 2px;
+}
+
+.vc-vencorfy-game-option {
+    background: none;
+    border: none;
+    border-radius: 6px;
+    color: var(--bf-text);
+    text-align: left;
+    padding: 6px 9px;
+    font-size: 11.5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    transition:
+        background-color 0.12s ease,
+        color 0.12s ease;
+}
+
+.vc-vencorfy-game-option:hover {
+    background-color: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+    color: #fff;
+}
+
+.vc-vencorfy-game-exe {
+    color: var(--bf-muted);
+    font-size: 10px;
+}
+
+.vc-vencorfy-strip-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.vc-vencorfy-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 2px 0 6px;
+    scroll-behavior: smooth;
+}
+
+.vc-vencorfy-arrow {
+    position: absolute;
+    top: 2px;
+    bottom: 12px;
+    width: 28px;
+    border: none;
+    color: #c4c9ce;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5;
+    opacity: 0;
+    transition:
+        opacity 0.18s ease,
+        width 0.15s ease,
+        color 0.15s;
+}
+
+.vc-vencorfy-arrow:hover {
+    opacity: 1 !important;
+    width: 34px;
+    color: #fff;
+}
+
+.vc-vencorfy-section:hover .vc-vencorfy-arrow {
+    opacity: 0.85;
+}
+
+.vc-vencorfy-arrow-left {
+    left: 0;
+    border-radius: var(--bf-radius-sm) 0 0 var(--bf-radius-sm);
+    background: linear-gradient(to right, rgb(18 19 22 / 92%) 0%, transparent 100%);
+}
+
+.vc-vencorfy-arrow-right {
+    right: 0;
+    border-radius: 0 var(--bf-radius-sm) var(--bf-radius-sm) 0;
+    background: linear-gradient(to left, rgb(18 19 22 / 92%) 0%, transparent 100%);
+}
+
+.vc-vencorfy-cell {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 6px 7px;
+    border-radius: 9px;
+    border: 1.5px solid var(--bf-border);
+    cursor: pointer;
+    transition:
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        transform 0.12s ease,
+        box-shadow 0.15s ease;
+    position: relative;
+    min-width: 72px;
+    background: rgb(255 255 255 / 2%);
+}
+
+.vc-vencorfy-cell-img {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+}
+
+.vc-vencorfy-cell-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bf-text);
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 66px;
+}
+
+.vc-vencorfy-cell-req {
+    font-size: 9.5px;
+    color: var(--bf-muted);
+    opacity: 0.9;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.vc-vencorfy-cell:hover {
+    border-color: var(--bf-border-strong);
+    background-color: var(--background-modifier-hover, rgb(255 255 255 / 7%));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgb(0 0 0 / 25%);
+}
+
+.vc-vencorfy-cell:active {
+    transform: translateY(0);
+    background-color: var(--background-modifier-active, rgb(255 255 255 / 11%));
+}
+
+.vc-vencorfy-cell.owned {
+    background: var(--bf-owned-bg);
+    border-color: rgb(35 165 90 / 32%);
+}
+
+.vc-vencorfy-cell.owned:hover {
+    background: rgb(35 165 90 / 22%);
+    border-color: var(--bf-owned);
+}
+
+.vc-vencorfy-cell.owned .vc-vencorfy-cell-label {
+    color: #40c476;
+}
+
+.vc-vencorfy-cell.owned .vc-vencorfy-cell-req {
+    color: rgb(219 222 225 / 82%);
+}
+
+.vc-vencorfy-cell.current {
+    background: rgb(88 101 242 / 16%);
+    border-color: var(--bf-accent);
+}
+
+.vc-vencorfy-cell.current:hover {
+    background: rgb(88 101 242 / 25%);
+    border-color: #7983f5;
+}
+
+.vc-vencorfy-cell.current .vc-vencorfy-cell-label {
+    color: #8ea1ff;
+    font-weight: 700;
+}
+
+.vc-vencorfy-cell.current .vc-vencorfy-cell-req {
+    color: rgb(219 222 225 / 88%);
+}
+
+.vc-vencorfy-cell.maxed {
+    background: rgb(240 178 50 / 14%);
+    border-color: var(--bf-maxed);
+}
+
+.vc-vencorfy-cell.maxed:hover {
+    background: rgb(240 178 50 / 22%);
+    border-color: #f6c65b;
+}
+
+.vc-vencorfy-cell.maxed .vc-vencorfy-cell-label {
+    color: var(--bf-maxed);
+    font-weight: 700;
+}
+
+.vc-vencorfy-cell.maxed .vc-vencorfy-cell-req {
+    color: rgb(246 210 126 / 90%);
+}
+
+.vc-vencorfy-cell:hover .vc-vencorfy-cell-label {
+    color: #fff;
+}
+
+.vc-vencorfy-cell:hover .vc-vencorfy-cell-req {
+    color: var(--bf-text);
+    opacity: 0.95;
+}
+
+.vc-vencorfy-cell-badge {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vc-vencorfy-cell-badge.owned {
+    color: var(--bf-owned);
+}
+
+.vc-vencorfy-cell-badge.current {
+    color: #8ea1ff;
+}
+
+.vc-vencorfy-cell.maxed .vc-vencorfy-cell-badge.current {
+    color: var(--bf-maxed);
+}
+
+.vc-vencorfy-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 4px 2px;
+    font-size: 11px;
+    color: var(--bf-muted);
+    margin-top: 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vc-vencorfy-stats strong {
+    color: var(--bf-text);
+}
+
+.vc-vencorfy-reset-btn {
+    background: var(--bf-surface);
+    border: 1px solid var(--bf-border);
+    color: var(--bf-muted);
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-size: 10.5px;
+    cursor: pointer;
+    transition:
+        color 0.15s ease,
+        border-color 0.15s ease,
+        background-color 0.15s ease;
+}
+
+.vc-vencorfy-reset-btn:hover {
+    color: #fff;
+    border-color: var(--bf-border-strong);
+    background-color: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+}
+
+.vc-vencorfy-task-box {
+    margin-top: 10px;
+    background: var(--bf-surface);
+    border: 1px solid var(--bf-border);
+    border-radius: 10px;
+    padding: 10px 12px 9px;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 35%);
+}
+
+.vc-vencorfy-task-box.success {
+    border-color: rgb(35 165 90 / 60%);
+}
+
+.vc-vencorfy-task-box.error {
+    border-color: rgb(237 66 69 / 60%);
+}
+
+.vc-vencorfy-task-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    gap: 8px;
+}
+
+.vc-vencorfy-task-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    flex: 1;
+}
+
+.vc-vencorfy-task-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--bf-accent);
+}
+
+.vc-vencorfy-task-box.success .vc-vencorfy-task-icon {
+    color: var(--bf-owned);
+}
+
+.vc-vencorfy-task-box.error .vc-vencorfy-task-icon {
+    color: var(--bf-danger);
+}
+
+.vc-vencorfy-task-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.vc-vencorfy-cancel-btn {
+    background: rgb(237 66 69 / 15%);
+    color: #f67b7e;
+    border: 1px solid rgb(237 66 69 / 30%);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2.5px 8px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.vc-vencorfy-cancel-btn:hover {
+    background: var(--bf-danger);
+    color: #fff;
+}
+
+.vc-vencorfy-progress-bar {
+    height: 4px;
+    background: rgb(255 255 255 / 8%);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.vc-vencorfy-progress-fill {
+    height: 100%;
+    background: var(--bf-accent);
+    border-radius: 4px;
+    transition: width 0.25s ease;
+}
+
+.vc-vencorfy-task-box.success .vc-vencorfy-progress-fill {
+    background: var(--bf-owned);
+}
+
+.vc-vencorfy-task-box.error .vc-vencorfy-progress-fill {
+    background: var(--bf-danger);
+}
+
+.vc-vencorfy-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 68%);
+    backdrop-filter: blur(3px);
+    z-index: 20;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.vc-vencorfy-sheet {
+    width: 100%;
+    background: var(--bf-surface);
+    border-top: 1px solid var(--bf-border-strong);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -8px 28px rgb(0 0 0 / 60%);
+    padding: 12px 16px 16px;
+    animation: vc-vencorfy-slide-up 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes vc-vencorfy-slide-up {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.vc-vencorfy-sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: rgb(255 255 255 / 18%);
+    border-radius: 2px;
+    margin: 0 auto 10px;
+}
+
+.vc-vencorfy-sheet-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.vc-vencorfy-sheet-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.vc-vencorfy-sheet-img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+}
+
+.vc-vencorfy-sheet-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.vc-vencorfy-sheet-cat {
+    font-size: 11px;
+    color: var(--bf-muted);
+}
+
+.vc-vencorfy-progression-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bf-bg);
+    border: 1px solid var(--bf-border);
+    border-radius: var(--bf-radius);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+}
+
+.vc-vencorfy-progression-box {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vc-vencorfy-progression-box.target {
+    text-align: right;
+}
+
+.vc-vencorfy-progression-tag {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bf-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.vc-vencorfy-progression-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.vc-vencorfy-progression-box.target .vc-vencorfy-progression-val {
+    color: #8ea1ff;
+}
+
+.vc-vencorfy-sheet-summary {
+    font-size: 11.5px;
+    color: var(--bf-text);
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.vc-vencorfy-notice-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgb(240 178 50 / 8%);
+    border: 1px solid rgb(240 178 50 / 22%);
+    border-radius: var(--bf-radius-sm);
+    padding: 7px 10px;
+    font-size: 11px;
+    color: #f6d27e;
+    line-height: 1.35;
+    margin-bottom: 12px;
+}
+
+.vc-vencorfy-sheet-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-vencorfy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: none;
+    border-radius: 9px;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.vc-vencorfy-btn-primary {
+    flex: 1;
+    background: var(--bf-accent);
+    color: #fff;
+}
+
+.vc-vencorfy-btn-primary:hover:not(:disabled) {
+    background: var(--bf-accent-h);
+}
+
+.vc-vencorfy-btn:disabled {
+    background: var(--bf-surface-h);
+    border: 1px solid var(--bf-border);
+    color: var(--bf-muted);
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.vc-vencorfy-btn-secondary {
+    background: var(--bf-surface-h);
+    border: 1px solid var(--bf-border);
+    color: var(--bf-text);
+}
+
+.vc-vencorfy-btn-secondary:hover {
+    background: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+    color: #fff;
+}
+
+.vc-vencorfy-task-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Bottom-left Discord Account / Quest-style Progress Widget */
+.vc-vencorfy-widget {
+    padding: 10px 10px 9px;
+    margin: 0;
+    border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    background: var(--bg-overlay-app-frame, transparent);
+    font-family: var(--font-primary, "gg sans", "Noto Sans", sans-serif);
+    user-select: none;
+    box-sizing: border-box;
+    transition: background-color 0.15s ease;
+}
+
+.vc-vencorfy-widget *,
+.vc-vencorfy-widget *::before,
+.vc-vencorfy-widget *::after {
+    box-sizing: border-box;
+}
+
+.vc-vencorfy-widget-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.vc-vencorfy-widget-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 2px;
+    margin: -2px;
+    transition: background-color 0.12s ease;
+}
+
+.vc-vencorfy-widget-main:hover {
+    background-color: var(--background-modifier-hover, rgb(255 255 255 / 5%));
+}
+
+.vc-vencorfy-widget-icon-wrap {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgb(88 101 242 / 14%);
+    border: 1px solid rgb(88 101 242 / 28%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.vc-vencorfy-widget.is-completed .vc-vencorfy-widget-icon-wrap {
+    background: rgb(35 165 90 / 16%);
+    border-color: rgb(35 165 90 / 36%);
+}
+
+.vc-vencorfy-widget.is-error .vc-vencorfy-widget-icon-wrap {
+    background: rgb(237 66 69 / 16%);
+    border-color: rgb(237 66 69 / 36%);
+}
+
+.vc-vencorfy-widget-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.vc-vencorfy-widget-badge {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--brand-500, #5865f2);
+    color: #fff;
+    border: 2px solid var(--background-secondary-alt, #18191c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vc-vencorfy-widget-badge.completed {
+    background: var(--status-positive, #23a55a);
+}
+
+.vc-vencorfy-widget-badge.error {
+    background: var(--status-danger, #ed4245);
+}
+
+.vc-vencorfy-widget-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+    gap: 1px;
+}
+
+.vc-vencorfy-widget-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.vc-vencorfy-widget-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--header-primary, #fff);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+
+.vc-vencorfy-widget-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 15px;
+    padding: 0 5px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: var(--brand-500, #5865f2);
+    flex-shrink: 0;
+}
+
+.vc-vencorfy-widget-pill.completed {
+    background: var(--status-positive, #23a55a);
+}
+
+.vc-vencorfy-widget-pill.error {
+    background: var(--status-danger, #ed4245);
+}
+
+.vc-vencorfy-widget-sub {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-muted, #949ba4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+}
+
+.vc-vencorfy-widget.is-completed .vc-vencorfy-widget-sub {
+    color: var(--status-positive, #40c476);
+}
+
+.vc-vencorfy-widget.is-error .vc-vencorfy-widget-sub {
+    color: var(--status-danger, #f67b7e);
+}
+
+.vc-vencorfy-widget-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.vc-vencorfy-widget-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--interactive-normal, #b5bac1);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.vc-vencorfy-widget-btn:hover {
+    background: var(--background-modifier-hover, rgb(255 255 255 / 8%));
+    color: var(--interactive-hover, #fff);
+}
+
+.vc-vencorfy-widget-btn:active {
+    background: var(--background-modifier-active, rgb(255 255 255 / 12%));
+}
+
+.vc-vencorfy-widget-btn-stop:hover {
+    background: rgb(237 66 69 / 16%);
+    color: var(--status-danger, #ed4245);
+}
+
+.vc-vencorfy-widget-track {
+    margin-top: 8px;
+    height: 4px;
+    width: 100%;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 9%);
+    overflow: hidden;
+}
+
+.vc-vencorfy-widget-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: var(--brand-500, #5865f2);
+    transition:
+        width 0.25s ease,
+        background-color 0.2s ease;
+}
+
+.vc-vencorfy-widget.is-completed .vc-vencorfy-widget-fill {
+    background: var(--status-positive, #23a55a);
+}
+
+.vc-vencorfy-widget.is-error .vc-vencorfy-widget-fill {
+    background: var(--status-danger, #ed4245);
+}
+
+/* Discord-native Floating Context Tooltip */
+.vc-vencorfy-tooltip {
+    position: fixed;
+    z-index: 100000;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.95) translateY(2px);
+    transform-origin: bottom center;
+    transition:
+        opacity 0.1s ease,
+        transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: var(--font-primary, "gg sans", "Noto Sans", sans-serif);
+    user-select: none;
+}
+
+.vc-vencorfy-tooltip.is-below {
+    transform-origin: top center;
+    transform: scale(0.95) translateY(-2px);
+}
+
+.vc-vencorfy-tooltip.is-visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.vc-vencorfy-tooltip-content {
+    position: relative;
+    z-index: 2;
+    background-color: var(--background-floating, var(--bg-surface-overlay, #232428));
+    color: var(--text-normal, #f2f3f5);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 16px;
+    padding: 7px 11px;
+    border-radius: 7px;
+    border: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    box-shadow: 0 8px 16px rgb(0 0 0 / 36%);
+    white-space: nowrap;
+}
+
+.vc-vencorfy-tooltip-pointer {
+    position: absolute;
+    z-index: 3;
+    bottom: -4px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    background-color: var(--background-floating, var(--bg-surface-overlay, #232428));
+    border-right: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    transform: rotate(45deg);
+}
+
+.vc-vencorfy-tooltip.is-below .vc-vencorfy-tooltip-pointer {
+    bottom: auto;
+    top: -4px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+    border-top: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
+}
