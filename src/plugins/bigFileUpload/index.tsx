@@ -380,8 +380,8 @@ export default definePlugin({
         {
             find: ".CREATE_FORUM_POST||",
             replacement: {
-                match: /(textValue:.{0,50}channelId:\i\.id\}\))(?:,\i(,))?/,
-                replace: "$1,$self.renderUploadProgress()$2"
+                match: /(,\(0,\i\.jsx\)\(\i(?:\.\i)?,\{error:\i\}\))/,
+                replace: "$1,$self.renderUploadProgress()"
             }
         },
         // Forces an early return on the file size limit nitro upsell modal
@@ -396,7 +396,7 @@ export default definePlugin({
         {
             find: "Unexpected mismatch between files and file metadata",
             replacement: {
-                match: /(if\()(\(0,\i\.\i\)\(\i,\i\))(\)return void \i\(\i,\i\);)/,
+                match: /(if\()(\(0,\i\.\i\)\((?:\i,\i|\{[^}]*\}\)))(\)return void \i\(\i,\i\);)/,
                 replace: "$1$self.shouldBypassDiscordUploadSizeCheck()?false:$2$3"
             }
         },
