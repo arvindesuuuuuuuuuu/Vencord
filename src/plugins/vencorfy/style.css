@@ -162,7 +162,6 @@ svg.vc-vencorfy-spinning,
     from {
         transform: rotate(0deg);
     }
-
     to {
         transform: rotate(360deg);
     }
@@ -799,7 +798,6 @@ svg.vc-vencorfy-spinning,
     from {
         transform: translateY(100%);
     }
-
     to {
         transform: translateY(0);
     }
@@ -962,10 +960,12 @@ svg.vc-vencorfy-spinning,
 
 /* Bottom-left Discord Account / Quest-style Progress Widget */
 .vc-vencorfy-widget {
+    position: fixed;
+    z-index: 100;
     padding: 10px 10px 9px;
     margin: 0;
     border-bottom: 1px solid var(--border-subtle, rgb(255 255 255 / 8%));
-    background: var(--bg-overlay-app-frame, transparent);
+    background: var(--background-surface-high, var(--background-secondary-alt, #18191c));
     font-family: var(--font-primary, "gg sans", "Noto Sans", sans-serif);
     user-select: none;
     box-sizing: border-box;

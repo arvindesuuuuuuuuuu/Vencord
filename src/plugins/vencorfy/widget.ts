@@ -36,6 +36,8 @@ interface WidgetDom {
 let widgetDom: WidgetDom | null = null;
 let unsubscribeTask: (() => void) | null = null;
 let domObserver: MutationObserver | null = null;
+let panelResizeObserver: ResizeObserver | null = null;
+let currentPanels: HTMLElement | null = null;
 
 function findPanelsContainer(): HTMLElement | null {
     const byClass = document.querySelector<HTMLElement>(
@@ -222,7 +224,19 @@ export function syncProgressWidget() {
     }
 
     const panels = findPanelsContainer();
-    if (!panels) return;
+    if (!panels || !document.body) {
+        widgetDom?.root.remove();
+        currentPanels = null;
+        panelResizeObserver?.disconnect();
+        return;
+    }
+
+    if (currentPanels !== panels) {
+        currentPanels = panels;
+        panelResizeObserver?.disconnect();
+        panelResizeObserver = new ResizeObserver(syncProgressWidget);
+        panelResizeObserver.observe(panels);
+    }
 
     if (!widgetDom) {
         widgetDom = createWidgetDom();
@@ -230,8 +244,13 @@ export function syncProgressWidget() {
 
     updateWidgetDom(widgetDom, task);
 
-    if (panels.firstElementChild !== widgetDom.root) {
-        panels.prepend(widgetDom.root);
+    const rect = panels.getBoundingClientRect();
+    widgetDom.root.style.left = `${rect.left}px`;
+    widgetDom.root.style.width = `${rect.width}px`;
+    widgetDom.root.style.bottom = `${Math.max(0, window.innerHeight - rect.top)}px`;
+
+    if (!widgetDom.root.isConnected) {
+        document.body.appendChild(widgetDom.root);
     }
 }
 
@@ -243,13 +262,12 @@ export function startProgressWidget() {
         domObserver = new MutationObserver(() => {
             const task = getTaskState();
             if (!task || isWidgetHidden() || settings.store.showProgressWidget === false) return;
-            if (!widgetDom?.root.isConnected) {
-                syncProgressWidget();
-            }
+            if (!currentPanels?.isConnected || !widgetDom?.root.isConnected) syncProgressWidget();
         });
         domObserver.observe(document.body, { childList: true, subtree: true });
     }
 
+    window.addEventListener("resize", syncProgressWidget);
     syncProgressWidget();
 }
 
@@ -259,6 +277,10 @@ export function stopProgressWidget() {
     unsubscribeTask = null;
     domObserver?.disconnect();
     domObserver = null;
+    panelResizeObserver?.disconnect();
+    panelResizeObserver = null;
+    currentPanels = null;
+    window.removeEventListener("resize", syncProgressWidget);
     if (widgetDom?.root.isConnected) {
         widgetDom.root.remove();
     }

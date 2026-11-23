@@ -19,7 +19,7 @@
 // @ts-check
 
 import { execFileSync } from "child_process";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "fs/promises";
 import { tmpdir } from "os";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";

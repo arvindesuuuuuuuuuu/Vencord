@@ -54,7 +54,7 @@
 
 ## 📦 Installation
 
-Vencorfy is already included in [djdoolky76/Vencord](https://github.com/djdoolky76/Vencord). In that fork, enable it under **User Settings → Vencord → Plugins**. For other Vencord forks, `src/userplugins` is the simplest installation path:
+Vencorfy is already included in [djdoolky76/Vencord](https://github.com/djdoolky76/Vencord). If you use that fork's build, just enable it under **User Settings → Vencord → Plugins**. The steps below are for other Vencord builds.
 
 > [!NOTE]
 > Installing custom plugins requires building Vencord (or Equicord) from source. Make sure you have [Git](https://git-scm.com/), [Node.js](https://nodejs.org/), and [pnpm](https://pnpm.io/) installed.
@@ -75,15 +75,6 @@ Vencorfy is already included in [djdoolky76/Vencord](https://github.com/djdoolky
 3. **Enable the plugin in Discord:**
    - Restart or reload Discord (`Ctrl + R`).
    - Go to **User Settings → Vencord → Plugins**, search for **Vencorfy**, and toggle it **ON** (no client restart required).
-
-### Bundling into a fork's built-in plugins
-
-If you want Vencorfy tracked directly in your fork under `src/plugins/vencorfy` instead of `src/userplugins/vencorfy`, copy the plugin files there without the standalone repository's `.git` directory. Vencord's plugin-list generator requires built-in plugin authors to be entries in `Devs`, so make these two additional changes:
-
-1. Add `djdoolky76: { name: "djdoolky76", id: 546797199527247874n }` to the `Devs` object in `src/utils/constants.ts` (unless your fork already has it).
-2. In `src/plugins/vencorfy/index.tsx`, import `Devs` from `@utils/constants` and replace the `authors` value with `authors: [Devs.djdoolky76]`.
-
-Then run `pnpm build --dev` and `pnpm test` from the Vencord root. Keep the plugin files committed in your fork so future Vencord merges retain them. Updates to this standalone repository do not sync into forks automatically.
 
 ---
 

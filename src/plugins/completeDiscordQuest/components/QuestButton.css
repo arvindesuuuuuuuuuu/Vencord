@@ -50,15 +50,15 @@
     border-radius: 50%;
 }
 
-.quest-button-enrollable>.quest-button-status-indicator {
+.quest-button-enrollable > .quest-button-status-indicator {
     background-color: var(--status-danger);
 }
 
-.quest-button-enrolled>.quest-button-status-indicator {
+.quest-button-enrolled > .quest-button-status-indicator {
     background-color: var(--status-warning);
 }
 
-.quest-button-claimable>.quest-button-status-indicator {
+.quest-button-claimable > .quest-button-status-indicator {
     background-color: var(--status-positive);
 }
 

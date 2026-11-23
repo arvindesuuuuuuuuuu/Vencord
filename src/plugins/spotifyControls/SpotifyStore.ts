@@ -46,7 +46,7 @@ export interface Track {
     }[];
 }
 
-interface PlayerState {
+export interface PlayerState {
     accountId: string;
     track: Track | null;
     volumePercent: number,

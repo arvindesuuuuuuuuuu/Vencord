@@ -218,6 +218,8 @@ export async function generateFingerprint(userId: string): Promise<string> {
 }
 
 function setDebugRunningGame(game: Game | null, startedAt = Date.now()) {
+    if (IS_WEB) return;
+
     try {
         if (!game) {
             FluxDispatcher.dispatch({ type: "RUNNING_GAME_SET_DEBUG_GAME", game: null });
