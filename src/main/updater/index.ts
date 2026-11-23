@@ -16,5 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-if (!IS_UPDATER_DISABLED)
-    require(IS_STANDALONE ? "./http" : "./git");
+import { existsSync } from "fs";
+import { join } from "path";
+
+if (!IS_UPDATER_DISABLED) {
+    if (IS_STANDALONE || !existsSync(join(__dirname, "..", ".git"))) {
+        require("./http");
+    } else {
+        require("./git");
+    }
+}
